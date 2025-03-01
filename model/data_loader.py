@@ -8,69 +8,121 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class HAM10000ImageDataset(Dataset):
-    """
-    Dataset class for HAM10000 images.
-
-    Args:
-        csv_file (str): Path to the CSV file containing metadata.
-        images_path_1 (str): Directory for the first part of images.
-        images_path_2 (str): Directory for the second part of images.
-        transform (callable, optional): Transform to be applied on each image.
-        max_samples (int, optional): Maximum number of samples to load.
-
-    Attributes:
-        data (pd.DataFrame): DataFrame containing metadata and image paths.
-        transform (callable): Transform to be applied on images.
-        len_data (int): Total number of samples.
-        class_names (list): List of unique diagnosis labels.
-        class_to_idx (dict): Mapping from diagnosis labels to indices.
-    """
     def __init__(self, csv_file, images_path_1, images_path_2, transform=None, max_samples=None):
         self.transform = transform if transform is not None else transforms.ToTensor()
-        # Load the metadata CSV file.
+        
+        # Load metadata CSV
         self.data = pd.read_csv(csv_file)
         
-        # Create a column 'image_path' that points to the actual image file.
+        # Map abbreviated dx values to full class names.
+        dx_mapping = {
+            'akiec': 'actinic keratoses',
+            'bcc': 'basal cell carcinoma',
+            'bkl': 'benign keratosis-like lesions',
+            'df': 'dermatofibroma',
+            'mel': 'melanoma',
+            'nv': 'melanocytic nevi',
+            'vasc': 'vascular lesions'
+        }
+        self.data['dx'] = self.data['dx'].map(dx_mapping)
+        
+        # Resolve image paths
         self.data['image_path'] = self.data['image_id'].apply(
             lambda x: os.path.join(images_path_1, x + '.jpg')
             if os.path.exists(os.path.join(images_path_1, x + '.jpg'))
             else os.path.join(images_path_2, x + '.jpg')
         )
-        
-        # Optionally limit the number of samples.
+
+        # Limit dataset size
         if max_samples:
             self.data = self.data.head(max_samples)
         
         self.len_data = len(self.data)
-        
-        # Determine unique class labels and create a mapping.
+
+        # Class label mapping
         self.class_names = sorted(self.data['dx'].unique())
         self.class_to_idx = {label: i for i, label in enumerate(self.class_names)}
         
+        # Preprocess metadata (age, sex, localization)
+        # Fill missing ages with the median and scale down.
+        self.data.loc[:, 'age'] = self.data['age'].fillna(self.data['age'].median()) / 100.0
+        
+        # Clean and process the 'sex' column.
+        # Define a helper function for mapping.
+        def map_sex(x):
+            x = str(x).lower().strip() if pd.notnull(x) else ""
+            if x in ['male', 'm']:
+                return 0.0
+            elif x in ['female', 'f']:
+                return 1.0
+            else:
+                # Map unknown or unexpected values to 0.5
+                return 0.5
+        
+        self.data.loc[:, 'sex'] = self.data['sex'].apply(map_sex)
+        
+        # Process localization: fill missing with 'unknown' and encode as categorical codes.
+        self.data.loc[:, 'localization'] = self.data['localization'].fillna('unknown')
+        self.data.loc[:, 'localization'] = self.data['localization'].astype('category').cat.codes
+
+        # Verify that there are no missing values.
+        print(self.data[['age', 'sex', 'localization']].isnull().sum())
+
     def __len__(self):
         return self.len_data
 
     def get_nb_classes(self):
-        """Return the number of classes."""
         return len(self.class_names)
 
     def get_class_to_idx(self):
-        """Return the mapping of class labels to indices."""
         return self.class_to_idx
 
     def __getitem__(self, idx):
-        # Retrieve the row for the given index.
         row = self.data.iloc[idx]
         image_path = row['image_path']
-        # Load the image and convert it to RGB.
+        
+        # Load and transform image
         image = Image.open(image_path).convert('RGB')
         if self.transform:
             image = self.transform(image)
-        # Map the diagnosis label to an integer.
-        label = self.class_to_idx[row['dx']]
-        label = torch.tensor(label, dtype=torch.long)
-        return image, label
+        
+        # Convert label to integer
+        label = torch.tensor(self.class_to_idx[row['dx']], dtype=torch.long)
+
+        # Get metadata as a tensor: [age, sex, localization]
+        metadata = torch.tensor([row['age'], row['sex'], row['localization']], dtype=torch.float32)
+
+        return image, metadata, label
+
+
+    def __len__(self):
+        return self.len_data
+
+    def get_nb_classes(self):
+        return len(self.class_names)
+
+    def get_class_to_idx(self):
+        return self.class_to_idx
+
+    def __getitem__(self, idx):
+        row = self.data.iloc[idx]
+        image_path = row['image_path']
+        
+        # Load and transform image
+        image = Image.open(image_path).convert('RGB')
+        if self.transform:
+            image = self.transform(image)
+        
+        # Convert label to integer
+        label = torch.tensor(self.class_to_idx[row['dx']], dtype=torch.long)
+
+        # Get metadata as a tensor: [age, sex, localization]
+        metadata = torch.tensor([row['age'], row['sex'], row['localization']], dtype=torch.float32)
+
+        return image, metadata, label  # Now returns three values
+
 
 def get_dataloader(dataset, batch_size, train_split=0.8):
     """
@@ -92,6 +144,8 @@ def get_dataloader(dataset, batch_size, train_split=0.8):
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     
     return train_loader, test_loader
+
+
 
 def get_mean_std(dataset, batch_size):
     """

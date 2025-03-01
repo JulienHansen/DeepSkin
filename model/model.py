@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
+from torchvision.models import ResNet18_Weights
 
 class MultiModalLesionClassifier(nn.Module):
     """
@@ -21,7 +22,7 @@ class MultiModalLesionClassifier(nn.Module):
         
         # Define configurations for different model sizes.
         model_sizes = {
-            'small': {'meta_hidden': 16, 'classifier_layers': [64, 128]},
+            'small': {'meta_hidden': 32, 'classifier_layers': [64, 128, 256]},
             'base':  {'meta_hidden': 32, 'classifier_layers': [64, 128, 256]},
             'large': {'meta_hidden': 64, 'classifier_layers': [64, 128, 256, 512]}
         }
@@ -29,8 +30,8 @@ class MultiModalLesionClassifier(nn.Module):
             raise ValueError("Invalid model_size. Choose from 'small', 'base', or 'large'.")
         config = model_sizes[model_size]
         
-        # Image branch: Pretrained ResNet18 with final FC layer removed.
-        self.cnn = models.resnet18(weights=True)
+
+        self.cnn = models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
         num_ftrs = self.cnn.fc.in_features
         self.cnn.fc = nn.Identity()
         
