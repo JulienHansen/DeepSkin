@@ -60,7 +60,7 @@ def train(model, train_loader, test_loader, optimizer, criterion,
               f"Test Loss: {avg_test_loss:.4f}, Test Acc: {avg_test_acc:.4f} | "
               f"Time: {epoch_time:.2f}s")
         
-        # Save checkpoint every 'save_freq' epochs.
+        # Save checkpoint
         if (epoch + 1) % save_freq == 0:
             checkpoint_path = os.path.join(save_path, f"model_epoch_{epoch+1}.pt")
             torch.save({
@@ -76,19 +76,18 @@ def train(model, train_loader, test_loader, optimizer, criterion,
 
 
 if __name__ == '__main__':
-    # Usage example:
-    from model import MultiModalLesionClassifier  # Your model definition.
-    from data_loader import get_dataloader, HAM10000ImageDataset  # Your DataLoader and Dataset definitions.
+    from model import MultiModalLesionClassifier 
+    from data_loader import get_dataloader, HAM10000ImageDataset  
     from torchvision import transforms
     import torch
     import os
 
-    # Settings
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    num_meta_features = 3  # e.g., metadata might include 'age' and 'sex'
-    num_classes = 7        # Adjust according to your dataset
 
-    # Dataset paths and transformation pipeline.
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    num_meta_features = 3  # metadata  include 'age' and 'sex' and 'localization'
+    num_classes = 7        
+
+    # Dataset paths
     CSV_FILE = '../archive/HAM10000_metadata.csv'
     IMAGES_PATH_1 = '../archive/HAM10000_images_part_1/'
     IMAGES_PATH_2 = '../archive/HAM10000_images_part_2/'
@@ -99,21 +98,16 @@ if __name__ == '__main__':
                              std=[0.229, 0.224, 0.225])
     ])
     
-    # Instantiate the dataset.
+
     dataset = HAM10000ImageDataset(CSV_FILE, IMAGES_PATH_1, IMAGES_PATH_2,
                                    transform=transform_pipeline, max_samples=10000)
-    
-    # Create DataLoaders by passing the dataset.
+
     train_loader, test_loader = get_dataloader(dataset, batch_size=32, train_split=0.8)
-    
-    # Instantiate the model.
+
     model = MultiModalLesionClassifier(num_meta_features, num_classes).to(device)
-    
-    # Set up optimizer and loss function.
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = torch.nn.CrossEntropyLoss()
     
-    # Define training parameters.
     EPOCHS = 20
     SAVE_FREQ = 5
     SAVE_PATH = './checkpoints'

@@ -12,7 +12,7 @@ import io
 import torch
 from PIL import Image, ImageFile
 from torchvision import transforms
-from model import create_multimodal  # Import the function for model creation
+from model import create_multimodal 
 import pandas as pd
 
 # Mapping from index to class names for HAM10000
@@ -28,7 +28,7 @@ MODEL_TYPE_TO_PATH = {
     "large": "models/checkpoints/ham10000_large.pt"
 }
 
-ImageFile.LOAD_TRUNCATED_IMAGES = True  # Prevents PIL errors with truncated images
+ImageFile.LOAD_TRUNCATED_IMAGES = True 
 
 def load_model(model_size, device=None):
     """
@@ -71,7 +71,7 @@ def preprocess_image(image):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
-    image = transform(image).unsqueeze(0)  # Add batch dimension
+    image = transform(image).unsqueeze(0) 
     return image
 
 def preprocess_metadata(age, sex, localization):
@@ -86,11 +86,10 @@ def preprocess_metadata(age, sex, localization):
     Returns:
         torch.Tensor: Preprocessed metadata tensor.
     """
-    # Standardize metadata like in training
-    age = age / 100.0  # Scale age
-    sex = 0.0 if sex.lower() == 'male' else 1.0  # Encode sex
-    localization_code = pd.Categorical([localization]).codes[0]  # Encode localization
-    metadata = torch.tensor([[age, sex, localization_code]], dtype=torch.float32)  # Add batch dimension
+    age = age / 100.0  
+    sex = 0.0 if sex.lower() == 'male' else 1.0  
+    localization_code = pd.Categorical([localization]).codes[0]  
+    metadata = torch.tensor([[age, sex, localization_code]], dtype=torch.float32) 
     return metadata
 
 def predict(model, image, metadata, device=None):
@@ -107,30 +106,25 @@ def predict(model, image, metadata, device=None):
         dict: Predicted probabilities for each class.
     """
     if device is None:
-        device = next(model.parameters()).device  # Get model device
-    
-    # Preprocess inputs
+        device = next(model.parameters()).device 
+
     image_tensor = preprocess_image(image).to(device)
     metadata_tensor = preprocess_metadata(*metadata).to(device)
 
-    # Forward pass
+
     with torch.no_grad():
         output = model(image_tensor, metadata_tensor)
-        output = torch.nn.functional.softmax(output, dim=1)  # Convert logits to probabilities
+        output = torch.nn.functional.softmax(output, dim=1)  
 
     return {INDEX_TO_CLASS[i]: output[0][i].item() for i in range(len(output[0]))}
 
 if __name__ == '__main__':
-    # Example Usage:
     model = load_model('small')
 
-    # Encode an example image to base64
     with open("test_picture.jpg", "rb") as f:
         encoded_image = base64.b64encode(f.read())
 
-    # Example metadata
     example_metadata = (80, "male", "scalp")  # Age, Sex, Localization
 
-    # Predict
     predictions = predict(model, encoded_image, example_metadata)
     print(predictions)

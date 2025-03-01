@@ -68,7 +68,6 @@ class MultiModalLesionClassifier(nn.Module):
         """Return the number of trainable parameters."""
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
-# Functions to create model variants.
 def multimodal_small(num_meta_features, num_classes):
     """
     Create a small Multi-Modal Lesion Classifier.
@@ -109,8 +108,6 @@ def create_multimodal(num_meta_features, num_classes, model_size):
         raise ValueError("Invalid model size: choose from 'small', 'base', 'large'.")
 
 if __name__ == '__main__':
-    # Example usage:
-    # Assume the metadata has 2 features (for example, age and sex) and there are 7 classes.
     NUM_META_FEATURES = 3
     NUM_CLASSES = 7
     
