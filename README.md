@@ -89,7 +89,7 @@ Inference will be performed in real-time using the deployed model on **Google Cl
 
 | ID   | Week  | Task Description                                      | Status | Location | Required/Optional |
 |------|------|------------------------------------------------------|--------|----------|-------------------|
-| 1.1  | W01  | Form a team. | ✅ | [Our Team](#our-team) | Required |
+| 1.1  | W01  | Form a team. | ✅ | [Our Team](#stethoscope-our-team) | Required |
 | 1.2  | W02  | Select use case. | ✅ | [USECASE.md](USECASE.md) | Required |
 | 1.3  | W02  | Define use case.  | ✅ | [USECASE.md](USECASE.md) | Required |
 | 1.4  | W02  | Pick a creative project name. | ✅ | DeepSkin | Required |
