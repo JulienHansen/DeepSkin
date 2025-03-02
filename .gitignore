@@ -44,4 +44,7 @@ test/
 archive/
 HAM10000/
 
+# MacOS special files:
+.DS_Store
+
 
