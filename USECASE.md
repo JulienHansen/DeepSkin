@@ -38,10 +38,22 @@ We propose an application for automatically identifying nature and potential ris
 
 - Accuracy: Percentage of correctly classified lesions
 - Precision & Recall: Measures to balance false positives from false negatives
-- ROC curvz: Evaluate model in distinguishing malignant vs benign cases.
+- ROC curve: Evaluate model in distinguishing malignant vs benign cases.
 
 
 ## Evaluation
+
+# Offline evaluation
+
+- Data separation: Separate data into training, validation and test sets to avoid overlearning.
+- Error analysis: Identify the types of images or lesions on which the model fails, such as blurred or poorly lit lesions.
+- Cross-validation: Use cross-validation to test the generalizability of the model on several subsets of the data.
+
+# Online evaluation
+
+- User feedback: Gather feedback from users (dermatologists, patients) to fine-tune the model and its accuracy in a real-life context.
+- Error management: In the event of incorrect predictions, adjust the model or alert users to take further action.
+- Latency: Monitor the speed of model predictions to ensure rapid response.
 
 
 ## Modeling
@@ -54,7 +66,8 @@ CNN-based Deep learning model
 
 ## Feedback
 
-- User Reports: collect feedback on incorrect predictions made- Continuous Learning: Update the model with new labeled data 
+- User Reports: collect feedback on incorrect predictions made
+- Continuous Learning: Update the model with new labeled data 
 
 ## Project
 
