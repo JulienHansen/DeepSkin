@@ -100,7 +100,7 @@ if __name__ == '__main__':
     
 
     dataset = HAM10000ImageDataset(CSV_FILE, IMAGES_PATH_1, IMAGES_PATH_2,
-                                   transform=transform_pipeline, max_samples=10000)
+                                   transform=transform_pipeline, max_samples=1000)
 
     train_loader, test_loader = get_dataloader(dataset, batch_size=32, train_split=0.8)
 
