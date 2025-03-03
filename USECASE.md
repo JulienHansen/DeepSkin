@@ -43,13 +43,13 @@ We propose an application for automatically identifying nature and potential ris
 
 ## Evaluation
 
-# Offline evaluation
+### Offline evaluation
 
 - Data separation: Separate data into training, validation and test sets to avoid overlearning.
 - Error analysis: Identify the types of images or lesions on which the model fails, such as blurred or poorly lit lesions.
 - Cross-validation: Use cross-validation to test the generalizability of the model on several subsets of the data.
 
-# Online evaluation
+### Online evaluation
 
 - User feedback: Gather feedback from users (dermatologists, patients) to fine-tune the model and its accuracy in a real-life context.
 - Error management: In the event of incorrect predictions, adjust the model or alert users to take further action.
