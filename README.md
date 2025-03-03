@@ -81,7 +81,33 @@ Inference will be performed in real-time using the deployed model on **Google Cl
 
 ## :bricks: Building Blocks
 
-Here is a table summarizing all the features implemented in this project
-| Feature | Status |
-|---------|--------|
-|         |        |
+<!-- 
+| Not started | ❌    |
+| In Progress | ⏳  |
+| Done | ✅  |
+ -->
+
+| ID   | Week  | Task Description                                      | Status | Location | Required/Optional |
+|------|------|------------------------------------------------------|--------|----------|-------------------|
+| 1.1  | W01  | Form a team. | ✅ | [Our Team](#stethoscope-our-team) | Required |
+| 1.2  | W02  | Select use case. | ✅ | [USECASE.md](USECASE.md) | Required |
+| 1.3  | W02  | Define use case.  | ✅ | [USECASE.md](USECASE.md) | Required |
+| 1.4  | W02  | Pick a creative project name. | ✅ | DeepSkin | Required |
+| 1.5  | W02  | Set up a communication channel. | ✅ | Discord | Required |
+| 1.6  | W02  | Create a GitHub repository for code versioning. | ✅ | [DeepSkin](https://github.com/JulienHansen/DeepSkin) | Required |
+| 1.7  | W02  | Submit the project card with basic details for feedback. | ✅ | - | Required |
+| 2.1  | W03  | Perform Exploratory Data Analysis (EDA). | ✅ | [Here](exploratory_data_analisi.ipynb) | Required |
+| 2.2  | W03  | Set up Cloud environment (create project, grant access, set up billing). | ✅ | - | Required |
+| 2.3  | W04  | Train your ML model. | ⏳ | [Training](model/train.py) | Required |
+| 2.4  | W04  | Evaluate your ML model. | ⏳ | [Prediction](model/predict.py) | Required |
+| 2.5  | W03-W04 | Document data analysis and model performance. | ❌ | - | Required |
+| 3.1  | W05  | Build an API to serve your ML model. Run it locally. | ❌ | - | Required |
+| 3.2  | W05  | Package the API in a Docker container. Run it locally. | ❌ | - | Required |
+| 3.3  | W06  | Deploy the API in the Cloud, allowing remote predictions. | ❌ | - | Required |
+| 4.1  | W08  | Build an automated pipeline for training & deployment (e.g., Kubeflow, Sagemaker, GCP Vertex). | ❌ | - | Optional |
+| 5.1  | W09  | Run model training as a Cloud job (e.g., on a VM or managed service). | ❌ | - | Optional |
+| 5.2  | W10  | Build and deploy a simple UI/dashboard to showcase results. | ❌ | - | Optional |
+| 6.1  | W10  | Build a CI/CD pipeline (e.g., GitHub Actions) with at least one automated step. | ❌ | - | Required |
+| 6.2  | W10  | CI/CD step: Auto-deploy model serving components. | ❌ | - | Optional |
+| 6.3  | W10  | CI/CD step: Run Pylint for code quality checks. | ❌ | - | Optional |
+| 6.4  | W10  | CI/CD step: Run Pytest for unit tests. | ❌ | - | Optional |
