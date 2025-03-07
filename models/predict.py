@@ -12,7 +12,7 @@ import io
 import torch
 from PIL import Image, ImageFile
 from torchvision import transforms
-from model import create_multimodal 
+from .model import create_multimodal 
 import pandas as pd
 
 # Mapping from index to class names for HAM10000

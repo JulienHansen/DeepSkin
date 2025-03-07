@@ -1,0 +1,4 @@
+flask
+numpy
+pandas
+gunicorn # New library for the creation of the server
