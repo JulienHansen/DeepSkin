@@ -1,4 +1,8 @@
+torchvision
+Pillow
+torch
 flask
 numpy
 pandas
+requests
 gunicorn # New library for the creation of the server

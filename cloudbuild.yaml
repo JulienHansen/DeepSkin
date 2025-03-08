@@ -1,0 +1,6 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/deepskin-451908/flask-ml-app', '-f', 'deployment/Dockerfile', '.']
+images:
+  - 'gcr.io/deepskin-451908/flask-ml-app'
+

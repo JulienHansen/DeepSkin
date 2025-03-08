@@ -1,18 +1,21 @@
-# Python image
+# Use the official Python image as the base image
 FROM python:latest
 
-# Working Directory
+# Set the working directory inside the container
 WORKDIR /app
 
+# Copy the contents of the current directory (deployment) into the container's working directory
+# Copy the 'deployment' directory contents
+COPY deployment/ /app/deployment/
 
-COPY . . 
+# Copy the 'models' directory contents
+COPY models/ /app/models/
+
+# Install the dependencies listed in requirements.txt
+RUN pip install --no-cache-dir -r deployment/requirements.txt
 
 
-# Dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Command to run the application using Gunicorn
+ENTRYPOINT [ "python" ]
+CMD ["-m", "deployment.main"]
 
-
-EXPOSE 8080
-
-# Run command
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "app.main:app"]
