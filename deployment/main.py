@@ -52,6 +52,4 @@ def submit():
 
 
 if __name__ == '__main__':
-    print(f"Starting Server")
-    serve(app, host=HOST, port=PORT, threads=2, connection_limit=100)
-    #app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True, port=5100)
