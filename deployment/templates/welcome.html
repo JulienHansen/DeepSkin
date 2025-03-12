@@ -1,10 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Welcome !</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSkin API</title>
 </head>
 <body>
-	<h1>Test</h1>
+    <h1>Welcome to the DeepSkin API</h1>
+    <form id="imageForm" enctype="multipart/form-data">
+        <label for="imageInput">Upload Image:</label>
+        <input type="file" id="imageInput" accept="image/*">
+        <button type="submit">Submit</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById("imageForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById("imageInput");
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onloadend = async function() {
+                const base64Image = reader.result.split(',')[1]; // Get base64 string without the data URL prefix
+                const response = await fetch("/api", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ "image": base64Image })
+                });
+
+                const data = await response.json();
+                const resultDiv = document.getElementById("result");
+                if (data.error) {
+                    resultDiv.innerHTML = `Error: ${data.error}`;
+                } else {
+                    resultDiv.innerHTML = `Predictions: ${JSON.stringify(data.predictions)}`;
+                }
+            };
+
+            reader.readAsDataURL(file);
+        });
+    </script>
 </body>
 </html>
