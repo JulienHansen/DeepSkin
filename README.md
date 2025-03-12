@@ -96,7 +96,7 @@ Inference will be performed in real-time using the deployed model on **Google Cl
 | 1.5  | W02  | Set up a communication channel. | ✅ | Discord | Required |
 | 1.6  | W02  | Create a GitHub repository for code versioning. | ✅ | [DeepSkin](https://github.com/JulienHansen/DeepSkin) | Required |
 | 1.7  | W02  | Submit the project card with basic details for feedback. | ✅ | - | Required |
-| 2.1  | W03  | Perform Exploratory Data Analysis (EDA). | ✅ | [Here](exploratory_data_analisi.ipynb) | Required |
+| 2.1  | W03  | Perform Exploratory Data Analysis (EDA). | ✅ | [Here](https://github.com/JulienHansen/DeepSkin/blob/main/exploratory_data_analysis.ipynb) | Required |
 | 2.2  | W03  | Set up Cloud environment (create project, grant access, set up billing). | ✅ | - | Required |
 | 2.3  | W04  | Train your ML model. | ⏳ | [Training](model/train.py) | Required |
 | 2.4  | W04  | Evaluate your ML model. | ⏳ | [Prediction](model/predict.py) | Required |
