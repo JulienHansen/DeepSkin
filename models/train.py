@@ -3,6 +3,7 @@ import time
 from tqdm import tqdm
 import numpy as np
 import torch
+import matplotlib.pyplot as plt
 
 def train(model, train_loader, test_loader, optimizer, criterion, 
           epochs, device, save_freq, save_path):
@@ -20,6 +21,9 @@ def train(model, train_loader, test_loader, optimizer, criterion,
         save_freq (int): Frequency (in epochs) to save checkpoints.
         save_path (str): Directory path to save model checkpoints.
     """
+    avg_train_losses_history = []
+    avg_test_losses_history = []
+
     for epoch in tqdm(range(epochs), desc="Training"):
         epoch_start = time.time()
         model.train()
@@ -74,6 +78,45 @@ def train(model, train_loader, test_loader, optimizer, criterion,
             }, checkpoint_path)
             print(f"Saved checkpoint to {checkpoint_path}")
 
+        # Store losses for plotting
+        avg_train_losses_history.append(avg_train_loss)
+        avg_test_losses_history.append(avg_test_loss)
+
+    # Plot the losses after training
+    plot_losses(avg_train_losses_history, avg_test_losses_history)
+
+
+def plot_losses(train_losses, test_losses):
+    """
+    Plots the training and test losses over epochs.
+
+    Parameters:
+    - train_losses: List of training losses.
+    - test_losses: List of test losses.
+    """
+    # Plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, len(train_losses) + 1), train_losses, label='Train Loss', marker='o', color='royalblue', markersize=8, linewidth=2, linestyle='-', alpha=0.8)
+    plt.plot(range(1, len(test_losses) + 1), test_losses, label='Test Loss', marker='x', color='tomato', markersize=8, linewidth=2, linestyle='--', alpha=0.8)
+
+    # Labels and title with customization
+    plt.xlabel('Epochs', fontsize=14, fontweight='bold', color='darkblue')
+    plt.ylabel('Loss', fontsize=14, fontweight='bold', color='darkblue')
+    plt.title('Training and Test Losses over Epochs', fontsize=16, fontweight='bold', color='black')
+
+    # Adding grid and customizing it
+    plt.grid(True, linestyle='--', alpha=0.7)
+
+    # Improve legend and layout
+    plt.legend(fontsize=12, loc='best', frameon=True, framealpha=0.8, facecolor='lightgray')
+
+    # Save the plot as an image
+    plt.savefig('losses_plot.png', dpi=300)
+
+    # Show the plot
+    plt.tight_layout()
+    plt.show()
+
 
 if __name__ == '__main__':
     from model import MultiModalLesionClassifier 
@@ -108,7 +151,7 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = torch.nn.CrossEntropyLoss()
     
-    EPOCHS = 20
+    EPOCHS = 10
     SAVE_FREQ = 5
     SAVE_PATH = './checkpoints'
     os.makedirs(SAVE_PATH, exist_ok=True)
