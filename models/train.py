@@ -4,9 +4,11 @@ from tqdm import tqdm
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
+from model import MultiModalLesionClassifier  # Ensure this matches your model's import path
+from data_loader import get_dataloader, HAM10000ImageDataset  # Ensure this matches your data loader's import path
+from torchvision import transforms
 
-def train(model, train_loader, test_loader, optimizer, criterion, 
-          epochs, device, save_freq, save_path):
+def train(model, train_loader, test_loader, optimizer, criterion, epochs, device, save_freq, save_path):
     """
     Train the multi-modal lesion classification model.
 
@@ -28,20 +30,20 @@ def train(model, train_loader, test_loader, optimizer, criterion,
         epoch_start = time.time()
         model.train()
         train_losses, train_accs = [], []
-        
+
         # Training loop
         for images, metadata, labels in train_loader:
             images, metadata, labels = images.to(device), metadata.to(device), labels.to(device)
             outputs = model(images, metadata)
             loss = criterion(outputs, labels)
-            
+
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            
+
             train_losses.append(loss.item())
             train_accs.append((outputs.argmax(dim=1) == labels).float().mean().item())
-        
+
         # Evaluation loop
         model.eval()
         test_losses, test_accs = [], []
@@ -52,18 +54,18 @@ def train(model, train_loader, test_loader, optimizer, criterion,
                 loss = criterion(outputs, labels)
                 test_losses.append(loss.item())
                 test_accs.append((outputs.argmax(dim=1) == labels).float().mean().item())
-        
+
         avg_train_loss = np.mean(train_losses)
         avg_train_acc = np.mean(train_accs)
         avg_test_loss = np.mean(test_losses)
         avg_test_acc = np.mean(test_accs)
         epoch_time = time.time() - epoch_start
-        
+
         print(f"Epoch [{epoch+1}/{epochs}] "
               f"Train Loss: {avg_train_loss:.4f}, Train Acc: {avg_train_acc:.4f} | "
               f"Test Loss: {avg_test_loss:.4f}, Test Acc: {avg_test_acc:.4f} | "
               f"Time: {epoch_time:.2f}s")
-        
+
         # Save checkpoint
         if (epoch + 1) % save_freq == 0:
             checkpoint_path = os.path.join(save_path, f"model_epoch_{epoch+1}.pt")
@@ -85,7 +87,6 @@ def train(model, train_loader, test_loader, optimizer, criterion,
     # Plot the losses after training
     plot_losses(avg_train_losses_history, avg_test_losses_history)
 
-
 def plot_losses(train_losses, test_losses):
     """
     Plots the training and test losses over epochs.
@@ -94,37 +95,24 @@ def plot_losses(train_losses, test_losses):
     - train_losses: List of training losses.
     - test_losses: List of test losses.
     """
-    # Plot
     plt.figure(figsize=(10, 6))
     plt.plot(range(1, len(train_losses) + 1), train_losses, label='Train Loss', marker='o', color='royalblue', markersize=8, linewidth=2, linestyle='-', alpha=0.8)
     plt.plot(range(1, len(test_losses) + 1), test_losses, label='Test Loss', marker='x', color='tomato', markersize=8, linewidth=2, linestyle='--', alpha=0.8)
 
-    # Labels and title with customization
     plt.xlabel('Epochs', fontsize=14, fontweight='bold', color='darkblue')
     plt.ylabel('Loss', fontsize=14, fontweight='bold', color='darkblue')
     plt.title('Training and Test Losses over Epochs', fontsize=16, fontweight='bold', color='black')
 
-    # Adding grid and customizing it
     plt.grid(True, linestyle='--', alpha=0.7)
-
-    # Improve legend and layout
     plt.legend(fontsize=12, loc='best', frameon=True, framealpha=0.8, facecolor='lightgray')
 
-    # Save the plot as an image
     plt.savefig('losses_plot.png', dpi=300)
-
-    # Show the plot
     plt.tight_layout()
     plt.show()
 
 
-if __name__ == '__main__':
-    from model import MultiModalLesionClassifier 
-    from data_loader import get_dataloader, HAM10000ImageDataset  
-    from torchvision import transforms
-    import torch
-    import os
 
+if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     num_meta_features = 3  # metadata  include 'age' and 'sex' and 'localization'
@@ -143,7 +131,7 @@ if __name__ == '__main__':
     
 
     dataset = HAM10000ImageDataset(CSV_FILE, IMAGES_PATH_1, IMAGES_PATH_2,
-                                   transform=transform_pipeline, max_samples=1000)
+                                   transform=transform_pipeline, max_samples=10000)
 
     train_loader, test_loader = get_dataloader(dataset, batch_size=32, train_split=0.8)
 
