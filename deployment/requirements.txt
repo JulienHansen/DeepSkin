@@ -6,4 +6,5 @@ flask
 numpy
 pandas
 requests
-gunicorn # New library for the creation of the server
+gunicorn
+google-cloud-storage
