@@ -1,13 +1,62 @@
 import os
 import time
-from tqdm import tqdm
-import numpy as np
+import argparse
+import gcsfs  # Google Cloud Storage filesystem access
 import torch
+import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 from models.model import MultiModalLesionClassifier  # Ensure this matches your model's import path
 from models.data_loader import get_dataloader, HAM10000ImageDataset  # Ensure this matches your data loader's import path
 from torchvision import transforms
 from models.args_train import get_args_parser
+
+
+import os
+import gcsfs
+
+def download_from_gcs():
+    """
+    Downloads dataset from Google Cloud Storage (GCS) and stores it locally.
+    """
+    fs = gcsfs.GCSFileSystem()
+
+    # GCS Paths
+    GCS_CSV_PATH = 'gs://deepskin_dataset/archive/HAM10000_metadata.csv'
+    GCS_IMAGES_PATH_1 = 'gs://deepskin_dataset/archive/HAM10000_images_part_1/'
+    GCS_IMAGES_PATH_2 = 'gs://deepskin_dataset/archive/HAM10000_images_part_2/'
+
+    # Local Paths
+    LOCAL_CSV_PATH = './data/HAM10000_metadata.csv'
+    LOCAL_IMAGES_PATH_1 = './data/HAM10000_images_part_1/'
+    LOCAL_IMAGES_PATH_2 = './data/HAM10000_images_part_2/'
+
+    # Download CSV if not exists
+    if not os.path.exists(LOCAL_CSV_PATH):
+        print("Downloading metadata CSV...")
+        fs.get(GCS_CSV_PATH, LOCAL_CSV_PATH)
+    
+    # Download images if not exists
+    for gcs_path, local_path in [(GCS_IMAGES_PATH_1, LOCAL_IMAGES_PATH_1), (GCS_IMAGES_PATH_2, LOCAL_IMAGES_PATH_2)]:
+        if not os.path.exists(local_path):
+            print(f"Downloading images from {gcs_path} to {local_path}...")
+            os.makedirs(local_path, exist_ok=True)
+
+            # List all files in the GCS directory
+            files = fs.ls(gcs_path)
+
+            # Filter out directories or non-image files if necessary
+            image_files = [file for file in files if file.endswith(('.jpg', '.jpeg', '.png'))]
+
+            # Download each file one by one
+            for file in image_files:
+                local_file = os.path.join(local_path, os.path.basename(file))
+                fs.get(file, local_file)
+                print(f"Downloaded {file} to {local_file}")
+    
+    print("Dataset download complete!")
+
+
 
 def train(model, train_loader, test_loader, optimizer, criterion, epochs, device, save_freq, save_path):
     """
@@ -88,6 +137,7 @@ def train(model, train_loader, test_loader, optimizer, criterion, epochs, device
     # Plot the losses after training
     plot_losses(avg_train_losses_history, avg_test_losses_history)
 
+
 def plot_losses(train_losses, test_losses):
     """
     Plots the training and test losses over epochs.
@@ -111,13 +161,19 @@ def plot_losses(train_losses, test_losses):
     plt.tight_layout()
     plt.show()
 
+
 if __name__ == '__main__':
     # Parse the arguments
     parser = get_args_parser()
     args = parser.parse_args()
 
+    # Download dataset from GCS if not already present
+    if not os.path.exists(args.data_path):
+        print("Dataset not found locally, downloading from Google Cloud Storage...")
+        download_from_gcs()
+
     device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
-    num_meta_features = 3  # metadata  include 'age' and 'sex' and 'localization'
+    num_meta_features = 3  # metadata includes 'age', 'sex', and 'localization'
     num_classes = 7        
 
     # Dataset paths
@@ -144,6 +200,6 @@ if __name__ == '__main__':
     SAVE_PATH = args.save_path
     os.makedirs(SAVE_PATH, exist_ok=True)
     
-    # Start training.
+    # Start training
     train(model, train_loader, test_loader, optimizer, criterion, 
           epochs=args.epochs, device=device, save_freq=args.save_freq, save_path=SAVE_PATH)
