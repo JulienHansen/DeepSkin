@@ -4,9 +4,10 @@ from tqdm import tqdm
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-from model import MultiModalLesionClassifier  # Ensure this matches your model's import path
-from data_loader import get_dataloader, HAM10000ImageDataset  # Ensure this matches your data loader's import path
+from models.model import MultiModalLesionClassifier  # Ensure this matches your model's import path
+from models.data_loader import get_dataloader, HAM10000ImageDataset  # Ensure this matches your data loader's import path
 from torchvision import transforms
+from models.args_train import get_args_parser
 
 def train(model, train_loader, test_loader, optimizer, criterion, epochs, device, save_freq, save_path):
     """
@@ -110,41 +111,39 @@ def plot_losses(train_losses, test_losses):
     plt.tight_layout()
     plt.show()
 
-
-
 if __name__ == '__main__':
+    # Parse the arguments
+    parser = get_args_parser()
+    args = parser.parse_args()
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
     num_meta_features = 3  # metadata  include 'age' and 'sex' and 'localization'
     num_classes = 7        
 
     # Dataset paths
-    CSV_FILE = '../archive/HAM10000_metadata.csv'
-    IMAGES_PATH_1 = '../archive/HAM10000_images_part_1/'
-    IMAGES_PATH_2 = '../archive/HAM10000_images_part_2/'
+    CSV_FILE = os.path.join(args.data_path, 'HAM10000_metadata.csv')
+    IMAGES_PATH_1 = os.path.join(args.data_path, 'HAM10000_images_part_1/')
+    IMAGES_PATH_2 = os.path.join(args.data_path, 'HAM10000_images_part_2/')
+    
     transform_pipeline = transforms.Compose([
-        transforms.Resize((224, 224)),
+        transforms.Resize((args.img_size, args.img_size)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
                              std=[0.229, 0.224, 0.225])
     ])
     
-
     dataset = HAM10000ImageDataset(CSV_FILE, IMAGES_PATH_1, IMAGES_PATH_2,
-                                   transform=transform_pipeline, max_samples=10000)
+                                   transform=transform_pipeline, max_samples=args.max_samples)
 
-    train_loader, test_loader = get_dataloader(dataset, batch_size=32, train_split=0.8)
+    train_loader, test_loader = get_dataloader(dataset, batch_size=args.batch_size, train_split=args.train_prop)
 
     model = MultiModalLesionClassifier(num_meta_features, num_classes).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     criterion = torch.nn.CrossEntropyLoss()
     
-    EPOCHS = 10
-    SAVE_FREQ = 5
-    SAVE_PATH = './checkpoints'
+    SAVE_PATH = args.save_path
     os.makedirs(SAVE_PATH, exist_ok=True)
     
     # Start training.
     train(model, train_loader, test_loader, optimizer, criterion, 
-          epochs=EPOCHS, device=device, save_freq=SAVE_FREQ, save_path=SAVE_PATH)
-
+          epochs=args.epochs, device=device, save_freq=args.save_freq, save_path=SAVE_PATH)

@@ -14,7 +14,7 @@ def get_args_parser():
     parser.add_argument("--save_freq", type=int, default=5, help="Save frequency")
 
     # Dataset
-    parser.add_argument("--data_path", type=str, default="./data", help="Path to the data")
+    parser.add_argument("--data_path", type=str, default="../archive", help="Path to the data")
     parser.add_argument("--img_size", type=int, default=224, help="Size of the images")
 
     # Training parameters
