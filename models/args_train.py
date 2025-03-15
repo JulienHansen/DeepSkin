@@ -27,10 +27,10 @@ def get_args_parser():
     parser.add_argument("--seed", type=int, default=42, help="Seed for the random number generator")
     parser.add_argument("--device", type=str, default="cuda", help="Device to use to train the model")
     parser.add_argument("--load_all_in_ram", action="store_true", help="Load all the data in RAM")
-    parser.add_argument("--vertex_ai", action="store_true", help="Whether training is currently running on Vertex AI")
-    
-    # Misc
-    parser.add_argument("--wandb_mode", type=str, default="online",
-                        choices=["disabled", "online", "offline"], help="Wandb mode")
+        
+    # Cloud upload options
+    parser.add_argument("--on_cloud", action="store_true", help="Upload the trained model to the cloud (empties bucket before uploading).")
+    parser.add_argument("--cloud_save_path", type=str, default="gs://trained_deepskin_model/", help="GCS path to upload the final model (e.g. gs://bucket/path).")
 
     return parser
+
