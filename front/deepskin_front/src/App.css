@@ -25,7 +25,7 @@ header {
 
 /* Sidebar */
 .sidebar {
-  flex: 4 1 250px;
+  flex: 2 1 250px;
   max-width: 100%;
   position: sticky;
   /* top: 20px; */
