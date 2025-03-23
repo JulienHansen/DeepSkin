@@ -88,7 +88,14 @@ def predict_endpoint():
     image_file.seek(0)  # Rewind the file pointer before saving
     image_file.save(os.path.join(static_dir, 'uploaded_image.jpg'))  # Save the image temporarily
 
-    return render_template('result.html', prediction=prediction, image_url='/static/uploaded_image.jpg')
+    return render_template(
+        'result.html',
+        prediction=prediction,
+        image_url='/static/uploaded_image.jpg',
+        age=age,
+        sex=sex,
+        localization=localization
+    )
 
 
 # Simple frontend to test the API
