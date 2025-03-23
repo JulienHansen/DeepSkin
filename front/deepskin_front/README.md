@@ -34,7 +34,7 @@ From the `Deepskin` directory:
 
 ```bash
 docker build -f deployment/Dockerfile -t deepskin_api .
-docker run -p 5100:5100 deepskin_api
+docker run -p 5100:5100 --name deepskin_container deepskin_api
 ```
 
 Backend should be available at:  
