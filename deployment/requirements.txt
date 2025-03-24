@@ -8,3 +8,4 @@ pandas
 requests
 gunicorn
 google-cloud-storage
+google-cloud-aiplatform
