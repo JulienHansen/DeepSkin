@@ -1,0 +1,59 @@
+name: vertex-training
+
+on: push
+
+jobs:
+  check_commit:
+    runs-on: ubuntu-latest
+    outputs:
+      match: ${{ steps.commit-message-check.outputs.match }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Check Commit Message
+        id: commit-message-check
+        run: |
+          commit_message=$(git log -1 --pretty=%B)
+          echo "Commit message: $commit_message"
+          if [[ "$commit_message" == *"!train-vertex!"* ]]; then
+            echo "match=true" >> $GITHUB_OUTPUT
+            echo "Training requested."
+          else
+            echo "match=false" >> $GITHUB_OUTPUT
+            echo "Training not requested."
+          fi
+          echo "::debug::Commit message check completed."
+  
+  train_vertex_model:
+    needs: check_commit
+    if: needs.check_commit.outputs.match == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with: # Need to define that secrets.
+          credentials_json: ${{ secrets.GC_JSON }}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+    
+      - name: 'Use gcloud CLI'
+        run: |
+          gcloud info
+          echo "::debug::gcloud CLI info displayed."
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r deployment/requirements.txt
+          echo "::debug::Dependencies installed."
+
+      - name: Train the model on Vertex AI
+        run: |
+          cd vertex
+          bash start_vertex.sh
+          echo "::debug::Vertex AI training script executed."
