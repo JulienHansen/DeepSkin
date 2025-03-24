@@ -41,6 +41,14 @@ if not os.path.exists(static_dir):
 def predict_endpoint():
     if "image" not in request.files:
         return jsonify({"error": "No image provided"}), 400
+    
+    print("Debut print")
+    age = request.form.get("age")
+    sex = request.form.get("sex")
+
+    print(age)
+    print(sex)
+    print(request.files["image"])
 
     # Extract the image file
     image_file = request.files["image"]
@@ -76,6 +84,7 @@ def predict_endpoint():
     # Extract metadata from the form
     age = request.form.get("age")
     sex = request.form.get("sex")
+
     localization = request.form.get("localization")
 
     # Convert metadata to a tuple
@@ -87,6 +96,17 @@ def predict_endpoint():
     # Save the image to display on the result page
     image_file.seek(0)  # Rewind the file pointer before saving
     image_file.save(os.path.join(static_dir, 'uploaded_image.jpg'))  # Save the image temporarily
+
+    
+    return jsonify({
+        "prediction": max(prediction, key=prediction.get),  # Classe avec la plus grande proba
+        "probabilities": prediction,
+        "metadata": {
+            "age": age,
+            "sex": sex,
+            "localization": localization
+        }
+    })
 
     return render_template(
         'result.html',
