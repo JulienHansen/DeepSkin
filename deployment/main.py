@@ -42,13 +42,8 @@ def predict_endpoint():
     if "image" not in request.files:
         return jsonify({"error": "No image provided"}), 400
     
-    print("Debut print")
     age = request.form.get("age")
     sex = request.form.get("sex")
-
-    print(age)
-    print(sex)
-    print(request.files["image"])
 
     # Extract the image file
     image_file = request.files["image"]
