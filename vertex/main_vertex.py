@@ -44,6 +44,7 @@ training_args = [
     "--train_prop", "0.8",
     "--device", "cuda",
     "--img_size", "224",
+    "--max_samples", "10000",
     "--optimizer", "AdamW",
     "--save_path", "gs://trained_deepskin_model/trained_models/",
     "--on_cloud",
