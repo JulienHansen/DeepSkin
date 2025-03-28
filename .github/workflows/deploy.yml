@@ -29,7 +29,7 @@ jobs:
 
       - name: Build and push Docker image backend
         run: |
-          docker build -f deployment/Dockerfile --platform linux/amd64 --build-arg CRED=credentials.json -t deepskin-backend .
+          docker build -f deployment/Dockerfile --platform linux/amd64 --build-arg CRED=${{ secrets.GC_CLEM }} -t deepskin-backend .
           docker tag deepskin-backend europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-backend
           gcloud auth configure-docker europe-west1-docker.pkg.dev
           docker push europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-backend
