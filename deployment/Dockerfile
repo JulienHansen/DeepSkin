@@ -1,17 +1,28 @@
 # Use the official Python image as the base image
 FROM python:latest
 
-ARG CRED
+#ARG CRED
+
+ARG CRED_FILE
+ENV CRED_FILE_PATH /app/credentials.json
 
 #ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
 # Set the working directory inside the container
 WORKDIR /app
 
+# Copy the credentials file into the container
+COPY ${CRED_FILE} ${CRED_FILE_PATH}
+
+# Set the environment variable for Google Cloud credentials
+ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED_FILE_PATH}
+
+RUN cat ${CRED_FILE_PATH}
+
 # Créer le fichier credentials.json à partir de la clé
-RUN echo "$CRED" > /app/credentials.json
+#RUN echo "$CRED" > /app/credentials.json
 
 # Définir la variable d'environnement pour les credentials Google Cloud
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+#ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
 
 # Set the environment variable for Google Cloud credentials
 #ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED}
