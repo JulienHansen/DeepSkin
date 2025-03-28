@@ -20,9 +20,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/auth@v1
         with:
-          project_id: deepskin-451908
-          service_account_key: ${{ secrets.GC_CLEM }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.GC_CLEM }}
 
       - name: Configure gcloud
         run: |
@@ -61,9 +59,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/auth@v1
         with:
-          project_id: deepskin-451908
-          service_account_key: ${{ secrets.GC_CLEM }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.GC_CLEM }}
 
       - name: Build and push frontend image
         run: |
