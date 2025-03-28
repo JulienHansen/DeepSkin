@@ -1,0 +1,81 @@
+name: Deploy on Google Run 
+
+on:
+  push:
+    branches:
+      - develop_front
+
+jobs: 
+  deploy-backend:
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: deepskin-451908  
+      REGION: europe-west1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/auth@v1
+        with:
+          project_id: deepskin-451908
+          service_account_key: ${{ secrets.GC_CLEM }}
+          export_default_credentials: true
+
+      - name: Configure gcloud
+        run: |
+          gcloud config set project $PROJECT_ID
+          gcloud config set run/region $REGION
+
+      - name: Build and push Docker image backend
+        run: |
+          docker build -f deployment/Dockerfile --platform linux/amd64 -t deepskin-backend .
+          docker push europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-backend
+
+      - name: Deploy backend to Cloud Run
+        run: |
+          gcloud run deploy deepskin-back \
+            --image europe-west1-docker.pkg.dev/$PROJECT_ID/deepskin/deepskin-backend \
+            --platform managed \
+            --region $REGION \
+            --allow-unauthenticated \
+            --port 5100 \
+            --format json > backend_output.json
+
+      - name: Extract Backend URL
+        run: echo "BACKEND_URL=$(jq -r '.[0].status.url' backend_output.json)" >> $GITHUB_ENV
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: deepskin-451908  
+      REGION: europe-west1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/auth@v1
+        with:
+          project_id: deepskin-451908
+          service_account_key: ${{ secrets.GC_CLEM }}
+          export_default_credentials: true
+
+      - name: Build and push frontend image
+        run: |
+          docker build -f streamlit/Dockerfile --platform linux/amd64 -t deepskin-frontend .
+          docker push europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-frontend
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy deepskin-front \
+            --image europe-west1-docker.pkg.dev/$PROJECT_ID/deepskin/deepskin-frontend \
+            --platform managed \
+            --region $REGION \
+            --allow-unauthenticated \
+            --set-env-vars BACK_URL=${{ env.BACKEND_URL }} \
+            --port 8501 
