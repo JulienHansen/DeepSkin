@@ -31,6 +31,7 @@ jobs:
         run: |
           docker build -f deployment/Dockerfile --platform linux/amd64 -t deepskin-backend .
           docker tag deepskin-backend europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-backend
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
           docker push europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-backend
 
       - name: Deploy backend to Cloud Run
@@ -66,6 +67,7 @@ jobs:
         run: |
           docker build -f streamlit/Dockerfile --platform linux/amd64 -t deepskin-frontend .
           docker tag deepskin-frontend europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-frontend
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
           docker push europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-frontend
 
       - name: Deploy to Cloud Run
