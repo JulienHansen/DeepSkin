@@ -4,7 +4,7 @@ WORKDIR /app
 
 ARG GOOGLE_CREDENTIALS
 
-COPY format.py /app/format.py
+COPY deployment/format.py /app/format.py
 
 # Copier et vérifier le fichier credentials
 COPY credentials.json /app/credentials.json
