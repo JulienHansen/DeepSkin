@@ -1,47 +1,31 @@
-# Use the official Python image as the base image
+# Utiliser l'image officielle de Python comme base
 FROM python:latest
 
-#ARG CRED
-
+# Définir le chemin du fichier credentials dans le conteneur
 ARG CRED_FILE
-ENV CRED_FILE_PATH /app/credentials.json
-
-#ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy the credentials file into the container
-COPY ${CRED_FILE} ${CRED_FILE_PATH}
-
-# Set the environment variable for Google Cloud credentials
-ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED_FILE_PATH}
-
-#RUN cat ${CRED_FILE_PATH}
-
-# Créer le fichier credentials.json à partir de la clé
-#RUN echo "$CRED" > /app/credentials.json
+ENV CRED_FILE_PATH=/app/credentials.json
 
 # Définir la variable d'environnement pour les credentials Google Cloud
-#ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED_FILE_PATH}
 
-# Set the environment variable for Google Cloud credentials
-#ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED}
+# Définir le répertoire de travail à l'intérieur du conteneur
+WORKDIR /app
 
-# Créer un fichier credentials.json dans le conteneur et copier le fichier source
-#COPY ${CRED} /app/credentials.json
+# Copier le fichier de credentials dans le conteneur
+COPY ${CRED_FILE} ${CRED_FILE_PATH}
 
-# Afficher le contenu de la clé dans le fichier (attention à la sécurité)
-RUN echo "Contenu de la clé : $(CRED)"
+# Afficher le contenu du fichier de credentials pour vérifier s'il est bien copié (Uniquement pour debug, à retirer en production)
+RUN echo "Contenu du fichier credentials.json :" && cat ${CRED_FILE_PATH}
 
-# Copy the contents of the 'deployment' and 'models' directories into the container
+# Copier les répertoires deployment et models dans le conteneur
 COPY deployment/ /app/deployment/
 COPY models/ /app/models/
 
-# Expose port 5100 to allow external access
+# Exposer le port 5100 pour les connexions externes
 EXPOSE 5100
 
-# Install the dependencies listed in requirements.txt
+# Installer les dépendances listées dans requirements.txt
 RUN pip install --no-cache-dir -r deployment/requirements.txt
 
-# Command to run the application
+# Commande pour lancer l'application
 ENTRYPOINT ["python", "-m", "deployment.main"]
