@@ -16,7 +16,7 @@ COPY ${CRED_FILE} ${CRED_FILE_PATH}
 # Set the environment variable for Google Cloud credentials
 ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED_FILE_PATH}
 
-RUN cat ${CRED_FILE_PATH}
+#RUN cat ${CRED_FILE_PATH}
 
 # Créer le fichier credentials.json à partir de la clé
 #RUN echo "$CRED" > /app/credentials.json
