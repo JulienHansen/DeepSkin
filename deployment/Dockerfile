@@ -5,7 +5,7 @@ WORKDIR /app
 ARG GOOGLE_CREDENTIALS
 
 RUN if [ -n "$GOOGLE_CREDENTIALS" ]; then \
-        echo "$GOOGLE_CREDENTIALS" > /app/credentials.json; \
+        echo "$GOOGLE_CREDENTIALS" | base64 -d > /app/credentials.json; \
     fi
 
 ENV GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
