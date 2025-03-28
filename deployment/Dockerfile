@@ -12,6 +12,8 @@ RUN if [ -n "$GOOGLE_CREDENTIALS" ]; then \
 RUN chmod 777 /app/credentials.json
 RUN cat /app/credentials.json
 
+RUN python -m json.tool /app/credentials.json
+
 ENV GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
 
 COPY deployment/ /app/deployment/
