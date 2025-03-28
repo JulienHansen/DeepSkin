@@ -42,7 +42,6 @@ jobs:
             --region $REGION \
             --allow-unauthenticated \
             --timeout 900s \
-            --health-check-timeout 600s
             --port 5100 \
             --memory 2Gi \
             --format json > backend_output.json
