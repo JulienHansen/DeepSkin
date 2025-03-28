@@ -41,6 +41,7 @@ jobs:
             --platform managed \
             --region $REGION \
             --allow-unauthenticated \
+            --timeout 900s \
             --port 5100 \
             --memory 2Gi \
             --format json > backend_output.json
@@ -50,6 +51,7 @@ jobs:
 
   deploy-frontend:
     runs-on: ubuntu-latest
+    needs: deploy-backend
 
     env:
       PROJECT_ID: deepskin-451908  
