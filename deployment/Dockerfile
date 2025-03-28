@@ -2,18 +2,25 @@
 FROM python:latest
 
 
+
+
+
 # Définir le chemin du fichier credentials dans le conteneur
 ARG CRED_FILE
 ENV CRED_FILE_PATH=/app/credentials.json
 
 # Définir la variable d'environnement pour les credentials Google Cloud
-ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED}
+ENV CRED_FILE_PATH=/app/credentials.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED_FILE_PATH}
 
 # Définir le répertoire de travail à l'intérieur du conteneur
 WORKDIR /app
 
 # Copier le fichier de credentials dans le conteneur
-COPY ${CRED_FILE} ${CRED_FILE_PATH}
+ARG CRED
+RUN echo "$CRED" > ${CRED_FILE_PATH}
+
+RUN echo "Contenu du fichier credentials.json :" && cat ${CRED_FILE_PATH}
 
 # Afficher le contenu du fichier de credentials pour vérifier s'il est bien copié (Uniquement pour debug, à retirer en production)
 #RUN echo "Contenu du fichier credentials.json :" && cat ${CRED_FILE_PATH}
