@@ -3,7 +3,7 @@ FROM python:latest
 
 ARG CRED
 
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+#ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -11,10 +11,13 @@ WORKDIR /app
 #COPY credentials.json /app/credentials.json
 
 # Set the environment variable for Google Cloud credentials
-#ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED}
+ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED}
 
 # Créer un fichier credentials.json dans le conteneur et copier le fichier source
-COPY ${CRED} /app/credentials.json
+#COPY ${CRED} /app/credentials.json
+
+# Afficher le contenu de la clé dans le fichier (attention à la sécurité)
+RUN echo "Contenu de la clé : $(CRED)"
 
 # Copy the contents of the 'deployment' and 'models' directories into the container
 COPY deployment/ /app/deployment/
