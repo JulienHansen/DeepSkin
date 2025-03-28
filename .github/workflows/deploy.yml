@@ -32,6 +32,9 @@ jobs:
           gcloud config set project $PROJECT_ID
           gcloud config set run/region $REGION
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Build and push Docker image backend
         run: | 
           docker buildx build \
