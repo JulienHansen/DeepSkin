@@ -7,11 +7,14 @@ ARG CRED
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the service account JSON file into the container (adjust the file name/path as needed)
-#COPY credentials.json /app/credentials.json
+# Créer le fichier credentials.json à partir de la clé
+RUN echo "$CRED" > /app/credentials.json
+
+# Définir la variable d'environnement pour les credentials Google Cloud
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
 
 # Set the environment variable for Google Cloud credentials
-ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED}
+#ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED}
 
 # Créer un fichier credentials.json dans le conteneur et copier le fichier source
 #COPY ${CRED} /app/credentials.json
