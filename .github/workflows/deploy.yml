@@ -30,6 +30,7 @@ jobs:
       - name: Build and push Docker image backend
         run: |
           docker build -f deployment/Dockerfile --platform linux/amd64 -t deepskin-backend .
+          docker tag deepskin-backend europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-backend
           docker push europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-backend
 
       - name: Deploy backend to Cloud Run
@@ -64,6 +65,7 @@ jobs:
       - name: Build and push frontend image
         run: |
           docker build --build-arg CRED=${{ secrets.GC_CLEM }} -f streamlit/Dockerfile --platform linux/amd64 -t deepskin-frontend .
+          docker tag deepskin-frontend europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-frontend
           docker push europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-frontend
 
       - name: Deploy to Cloud Run
