@@ -34,11 +34,12 @@ jobs:
 
       - name: Build and push Docker image backend
         run: | 
-          docker build \
+          docker buildx build \
             -f streamlit/Dockerfile \
             --platform linux/amd64 \
             --build-arg GOOGLE_CREDENTIALS="${{ secrets.GC_CLEM }}" \
-            -t deepskin-backend .
+            -t deepskin-backend \
+            .
           docker tag deepskin-backend europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-backend
           gcloud auth configure-docker europe-west1-docker.pkg.dev
           docker push europe-west1-docker.pkg.dev/deepskin-451908/deepskin/deepskin-backend
