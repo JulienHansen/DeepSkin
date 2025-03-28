@@ -4,6 +4,23 @@ WORKDIR /app
 
 ARG GOOGLE_CREDENTIALS
 
+COPY format.py /app/format.py
+
+# Copier et vérifier le fichier credentials
+COPY credentials.json /app/credentials.json
+
+# Formater le fichier JSON
+RUN python /app/format.py /app/credentials.json
+
+# Vérifier le formatage
+RUN python -m json.tool /app/credentials.json
+
+# Set the environment variable for Google Cloud credentials
+ENV GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
+
+
+
+
 #Vérifie que GOOGLE CREDIENTALS n'est pas nul et crée le fichier
 RUN if [ -n "$GOOGLE_CREDENTIALS" ]; then \ 
         echo "$GOOGLE_CREDENTIALS" | base64 -d > /app/credentials.json; \

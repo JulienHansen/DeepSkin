@@ -27,6 +27,14 @@ jobs:
         run: |
           echo "$GC_CREDENTIALS" > credentials.json
 
+      - name: Prepare credentials
+        uses: actions/upload-artifact@v2
+        with:
+          name: credentials
+          path: |
+            credentials.json
+            format.py
+
       - name: Configure gcloud
         run: |
           gcloud config set project $PROJECT_ID
