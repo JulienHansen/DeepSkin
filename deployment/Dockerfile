@@ -14,11 +14,11 @@ ENV GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
 COPY deployment/ /app/deployment/
 COPY models/ /app/models/
 
-# Install the dependencies listed in requirements.txt
-RUN pip install --no-cache-dir -r deployment/requirements.txt
-
 # Expose port 5100 to allow external access
 EXPOSE 5100
+
+# Install the dependencies listed in requirements.txt
+RUN pip install --no-cache-dir -r deployment/requirements.txt
 
 # Command to run the application
 ENTRYPOINT ["python", "-m", "deployment.main"]
