@@ -38,7 +38,7 @@ jobs:
       - name: Build and push Docker image backend
         run: | 
           docker build \
-            -f streamlit/Dockerfile \
+            -f deployment/Dockerfile \
             --platform linux/amd64 \
             --build-arg GOOGLE_CREDENTIALS="$(echo "${{ secrets.GC_CLEM }}" | base64)" \
             -t deepskin-backend \
