@@ -2,7 +2,6 @@
 FROM python:latest
 
 ARG CRED
-ENV CRED = ${CRED}
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -11,7 +10,7 @@ WORKDIR /app
 #COPY credentials.json /app/credentials.json
 
 # Set the environment variable for Google Cloud credentials
-ENV GOOGLE_APPLICATION_CREDENTIALS=CRED
+ENV GOOGLE_APPLICATION_CREDENTIALS=${CRED}
 
 # Copy the contents of the 'deployment' and 'models' directories into the container
 COPY deployment/ /app/deployment/
