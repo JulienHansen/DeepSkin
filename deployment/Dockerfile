@@ -9,7 +9,7 @@ RUN if [ -n "$GOOGLE_CREDENTIALS" ]; then \
         echo "$GOOGLE_CREDENTIALS" | base64 -d > /app/credentials.json; \
     fi
 
-RUN chmod 644 /app/credentials.json
+RUN chmod 777 /app/credentials.json
 RUN cat /app/credentials.json
 
 ENV GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
