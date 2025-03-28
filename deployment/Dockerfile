@@ -1,6 +1,11 @@
 # Utiliser l'image officielle de Python comme base
 FROM python:latest
 
+COPY ${CRED} cred.json
+RUN cat cred.json
+
+RUN echo "Contenu du fichier credentials.json :" && cat cred.json
+
 # Définir le chemin du fichier credentials dans le conteneur
 ARG CRED_FILE
 ENV CRED_FILE_PATH=/app/credentials.json
