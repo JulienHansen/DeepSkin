@@ -42,7 +42,7 @@ jobs:
             --region $REGION \
             --allow-unauthenticated \
             --port 5100 \
-            --memory 1Gi \
+            --memory 2Gi \
             --format json > backend_output.json
 
       - name: Extract Backend URL
