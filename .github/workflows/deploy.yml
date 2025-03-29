@@ -70,6 +70,11 @@ jobs:
       - name: Extract Backend URL
         run: echo "BACKEND_URL=$(jq -r '.[0].status.url' backend_output.json)" >> $GITHUB_ENV
 
+      - name: Set Backend URL as output
+          BACKEND_URL=$(python -c "import json; print(json.load(open('backend_output.json'))['status']['url'])")
+          echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_OUTPUT
+          echo "Backend URL: $BACKEND_URL"
+
   deploy-frontend:
     runs-on: ubuntu-latest
     needs: deploy-backend
