@@ -1,6 +1,6 @@
 # DeepSkin :adhesive_bandage:
 
-<img src=".github/pictures/scheme.png" width=100%/>
+<img src=".github/pictures/final_scheme.png" width=100%/>
 
 ## :memo: About the Project
 
