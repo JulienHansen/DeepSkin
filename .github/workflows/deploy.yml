@@ -71,6 +71,7 @@ jobs:
         run: echo "BACKEND_URL=$(jq -r '.[0].status.url' backend_output.json)" >> $GITHUB_ENV
 
       - name: Set Backend URL as output
+        id: deploy-backend
         run: |
           BACKEND_URL=$(python -c "import json; print(json.load(open('backend_output.json'))['status']['url'])")
           echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_OUTPUT
@@ -108,5 +109,5 @@ jobs:
             --platform managed \
             --region $REGION \
             --allow-unauthenticated \
-            --set-env-vars BACK_URL=${{ env.BACKEND_URL }} \
+            --set-env-vars BACK_URL=${{ needs.deploy-backend.outputs.BACKEND_URL }} \
             --port 8501 
