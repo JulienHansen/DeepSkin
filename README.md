@@ -100,8 +100,8 @@ Inference will be performed in real-time using the deployed model on **Google Cl
 | 1.7  | W02  | Submit the project card with basic details for feedback. | ✅ | - | Required |
 | 2.1  | W03  | Perform Exploratory Data Analysis (EDA). | ✅ | [Here](https://github.com/JulienHansen/DeepSkin/blob/main/exploratory_data_analysis.ipynb) | Required |
 | 2.2  | W03  | Set up Cloud environment (create project, grant access, set up billing). | ✅ | - | Required |
-| 2.3  | W04  | Train your ML model. | ⏳ | [Training](model/train.py) | Required |
-| 2.4  | W04  | Evaluate your ML model. | ⏳ | [Prediction](model/predict.py) | Required |
+| 2.3  | W04  | Train your ML model. | ✅ | [Training](model/train.py) | Required |
+| 2.4  | W04  | Evaluate your ML model. | ✅ | [Prediction](model/predict.py) | Required |
 | 2.5  | W03-W04 | Document data analysis and model performance. | ✅ | - | Required |
 | 3.1  | W05  | Build an API to serve your ML model. Run it locally. | ✅ | - | Required |
 | 3.2  | W05  | Package the API in a Docker container. Run it locally. | ✅ | - | Required |
