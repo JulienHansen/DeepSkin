@@ -8,6 +8,8 @@ on:
 jobs: 
   deploy-backend:
     runs-on: ubuntu-latest
+    outputs:
+      backend_url: ${{ steps.deploy-backend.outputs.BACKEND_URL }}
 
     env:
       PROJECT_ID: deepskin-451908  
