@@ -106,6 +106,7 @@ if page == "Prediction":
     # API URL
     API_URL = "http://localhost:5100/predict"
     API_URL = f"{BACKEND_URL}/predict"
+    print(API_URL)
 
     st.title("Analyse de la peau avec IA")
 
