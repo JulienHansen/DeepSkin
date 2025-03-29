@@ -1,5 +1,7 @@
 # DeepSkin :adhesive_bandage:
 
+<img src=".github/pictures/scheme.png" width=100%/>
+
 ## :memo: About the Project
 
 Skin cancer is one of the most common forms of cancer, and early detection is crucial for effective treatment. However, many people worldwide lack easy access to dermatologists, leading to delays in diagnosis and unnecessary medical visits.
@@ -100,14 +102,14 @@ Inference will be performed in real-time using the deployed model on **Google Cl
 | 2.2  | W03  | Set up Cloud environment (create project, grant access, set up billing). | ✅ | - | Required |
 | 2.3  | W04  | Train your ML model. | ⏳ | [Training](model/train.py) | Required |
 | 2.4  | W04  | Evaluate your ML model. | ⏳ | [Prediction](model/predict.py) | Required |
-| 2.5  | W03-W04 | Document data analysis and model performance. | ❌ | - | Required |
-| 3.1  | W05  | Build an API to serve your ML model. Run it locally. | ❌ | - | Required |
-| 3.2  | W05  | Package the API in a Docker container. Run it locally. | ❌ | - | Required |
-| 3.3  | W06  | Deploy the API in the Cloud, allowing remote predictions. | ❌ | - | Required |
-| 4.1  | W08  | Build an automated pipeline for training & deployment (e.g., Kubeflow, Sagemaker, GCP Vertex). | ❌ | - | Optional |
+| 2.5  | W03-W04 | Document data analysis and model performance. | ✅ | - | Required |
+| 3.1  | W05  | Build an API to serve your ML model. Run it locally. | ✅ | - | Required |
+| 3.2  | W05  | Package the API in a Docker container. Run it locally. | ✅ | - | Required |
+| 3.3  | W06  | Deploy the API in the Cloud, allowing remote predictions. | ✅ | - | Required |
+| 4.1  | W08  | Build an automated pipeline for training & deployment (e.g., Kubeflow, Sagemaker, GCP Vertex). | ✅ | - | Optional |
 | 5.1  | W09  | Run model training as a Cloud job (e.g., on a VM or managed service). | ❌ | - | Optional |
-| 5.2  | W10  | Build and deploy a simple UI/dashboard to showcase results. | ❌ | - | Optional |
-| 6.1  | W10  | Build a CI/CD pipeline (e.g., GitHub Actions) with at least one automated step. | ❌ | - | Required |
-| 6.2  | W10  | CI/CD step: Auto-deploy model serving components. | ❌ | - | Optional |
+| 5.2  | W10  | Build and deploy a simple UI/dashboard to showcase results. | ✅ | - | Optional |
+| 6.1  | W10  | Build a CI/CD pipeline (e.g., GitHub Actions) with at least one automated step. | ✅ | - | Required |
+| 6.2  | W10  | CI/CD step: Auto-deploy model serving components. | ✅ | - | Optional |
 | 6.3  | W10  | CI/CD step: Run Pylint for code quality checks. | ❌ | - | Optional |
 | 6.4  | W10  | CI/CD step: Run Pytest for unit tests. | ❌ | - | Optional |
