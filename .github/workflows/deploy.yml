@@ -9,7 +9,7 @@ jobs:
   deploy-backend:
     runs-on: ubuntu-latest
     outputs:
-      backend_url: ${{ steps.deploy-backend.outputs.BACKEND_URL }}
+      BACKEND_URL: ${{ steps.deploy-backend.outputs.BACKEND_URL }}
 
     env:
       PROJECT_ID: deepskin-451908  
@@ -68,9 +68,6 @@ jobs:
             --port 5100 \
             --memory 2Gi \
             --format json > backend_output.json
-
-      - name: Extract Backend URL
-        run: echo "BACKEND_URL=$(jq -r '.[0].status.url' backend_output.json)" >> $GITHUB_ENV
 
       - name: Set Backend URL as output
         id: deploy-backend
