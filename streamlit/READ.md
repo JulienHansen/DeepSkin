@@ -2,6 +2,7 @@
 
 ## Description
 Deepskin is a streamlit application for analysing skin images to detect different classes of skin lesions such as : 
+
     - Actinic Keratoses / Bowen's Disease (akiec)
     - Basal Cell Carcinoma (bcc)
     - Benign Keratosis-like Lesions (bkl)
@@ -13,12 +14,14 @@ The application also includes a dashboard for viewing performance metrics (CPU, 
 
 ## Project structure
 
+```
 .
 ├── streamlit/               # Folder containing the frontend code
 │   ├── streamlit.py         # Streamlit user interface
 │   ├── requirements.txt     # Python dependency file
 │   ├── Dockerfile           # Dockerfile for the Streamlit application
 │   └── README.md            # Project documentation
+```
 
 ## Installation
 ### Prerequisites 
