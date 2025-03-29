@@ -1,24 +1,43 @@
-# Use the official Python image as the base image
 FROM python:latest
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the service account JSON file into the container (adjust the file name/path as needed)
+ARG GOOGLE_CREDENTIALS
+
+COPY deployment/format.py /app/format.py
+
+# Copier et vérifier le fichier credentials
 COPY credentials.json /app/credentials.json
+
+# Formater le fichier JSON
+RUN python /app/format.py /app/credentials.json
+
+# Vérifier le formatage
+RUN python -m json.tool /app/credentials.json
 
 # Set the environment variable for Google Cloud credentials
 ENV GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
 
-# Copy the contents of the 'deployment' and 'models' directories into the container
+
+
+
+#Vérifie que GOOGLE CREDIENTALS n'est pas nul et crée le fichier
+#RUN if [ -n "$GOOGLE_CREDENTIALS" ]; then \ 
+#        echo "$GOOGLE_CREDENTIALS" | base64 -d > /app/credentials.json; \
+#    fi
+#
+#RUN chmod 777 /app/credentials.json
+#RUN cat /app/credentials.json
+#
+#RUN python -m json.tool /app/credentials.json
+#
+#ENV GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
+
 COPY deployment/ /app/deployment/
 COPY models/ /app/models/
 
-# Install the dependencies listed in requirements.txt
 RUN pip install --no-cache-dir -r deployment/requirements.txt
 
-# Expose port 5100 to allow external access
 EXPOSE 5100
 
-# Command to run the application
 ENTRYPOINT ["python", "-m", "deployment.main"]
