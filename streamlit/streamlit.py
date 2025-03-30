@@ -7,6 +7,17 @@ import datetime
 import pandas as pd
 import os
 
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+.stDeployButton {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
+"""
+
+
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5100")
 
 PAGES = {
@@ -104,9 +115,7 @@ if page == "Prediction":
             st.write("---") 
 
     # API URL
-    API_URL = "http://localhost:5100/predict"
     API_URL = f"{BACKEND_URL}/predict"
-    print(API_URL)
 
     st.title("Analyse de la peau avec IA")
 
@@ -134,8 +143,28 @@ if page == "Prediction":
                 st.write("### Résultat de l'analyse")
                 st.write(f"**Classe prédite :** {result['prediction']}")
                 
+                #st.write("#### Détails des probabilités")
+                #st.json(result.get("probabilities", {}))
+
+                probabilities = result.get("probabilities", {})
+                # Conversion en DataFrame
+                df = pd.DataFrame(list(probabilities.items()), columns=["Nom de la maladie", "Probabilité"])
+
+                # Affichage du titre
                 st.write("#### Détails des probabilités")
-                st.json(result.get("probabilities", {}))
+
+                # Affichage du tableau avec les barres de progression
+                for index, row in df.iterrows():
+                    col1, col2, col3 = st.columns([2, 3, 1])
+                    
+                    with col1:
+                        st.write(row["Nom de la maladie"])
+                    
+                    with col2:
+                        st.progress(row["Probabilité"])  # Affiche une barre de progression
+                    
+                    with col3:
+                        st.write(f"{row['Probabilité']*100:.6f}%")  # Affiche le pourcentage en chiffres
             else:
                 st.error(f"Erreur: {response.json().get('error', 'Erreur inconnue')}")
         else:
@@ -159,12 +188,6 @@ elif page == "Dashboard":
         interval_seconds = 3600  # 1 heure en secondes
     else:
         interval_seconds = 300  # 5 minutes en secondes
-
-    metric_label = st.selectbox(
-    "Choisir la métrique",
-    ["CPU", "RAM", "Request Count", "Request Latency"]
-    )
-
 
     metric_label_cpu = "CPU"
     metric_label_ram = "RAM"
