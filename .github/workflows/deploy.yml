@@ -9,6 +9,7 @@ on:
 jobs: 
   deploy-backend:
     runs-on: ubuntu-latest
+    needs: pylint
     outputs:
       BACKEND_URL: ${{ steps.deploy-backend.outputs.BACKEND_URL }}
 
