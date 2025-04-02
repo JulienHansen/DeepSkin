@@ -23,7 +23,7 @@ class MultiModalLesionClassifier(nn.Module):
         classifier_layers = [64, 128, 256]
         
         # Image branch: Pretrained ResNet18
-        self.cnn = models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+        self.cnn = models.resnet18(weights=None)
         num_ftrs = self.cnn.fc.in_features
         self.cnn.fc = nn.Identity()  # Remove the original fully connected layer
         
