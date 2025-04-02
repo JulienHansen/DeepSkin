@@ -1,10 +1,15 @@
 name: Deploy on Google Run 
 
 on:
-  workflow_run:
-    workflows: ["Pylint"]
-    types:
-      - completed
+  pull_request:
+    branches:
+      - develop
+      - main
+  push: 
+    branches:
+      - develop
+      - main
+
 
 jobs: 
   deploy-backend:
