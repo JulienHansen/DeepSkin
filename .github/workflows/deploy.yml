@@ -2,7 +2,7 @@ name: Deploy on Google Run
 
 on:
   workflow_run:
-    workflows: ["Pylint"]
+    workflows: ["Pylint code quality check"]
     types:
       - completed
 
