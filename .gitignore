@@ -43,6 +43,7 @@ test/
 # Dataset
 archive/
 HAM10000/
+data/
 
 # MacOS special files:
 .DS_Store
