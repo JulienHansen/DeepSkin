@@ -3,7 +3,7 @@ name: Deploy on Google Run
 on:
   push:
     branches:
-      - develop_front
+      - develop
 
 jobs: 
   deploy-backend:
