@@ -1,7 +1,7 @@
 waitress
-torchvision==0.14.0
+torchvision==0.20
 Pillow
-torch==1.13.0
+torch==2.5
 flask
 numpy
 pandas
