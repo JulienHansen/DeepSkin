@@ -4,6 +4,9 @@ from google.cloud import storage
 import os
 from PIL import Image
 import io
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # Configuration for the API and GCS
 HOST = "0.0.0.0"

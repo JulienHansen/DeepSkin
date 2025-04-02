@@ -2,6 +2,9 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from torchvision.models import ResNet18_Weights
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 class MultiModalLesionClassifier(nn.Module):
     """
