@@ -17,7 +17,7 @@ The application also includes a dashboard for viewing performance metrics (CPU, 
 ```
 .
 ├── streamlit/               # Folder containing the frontend code
-│   ├── streamlit.py         # Streamlit user interface
+│   ├── main.py         # Streamlit user interface
 │   ├── requirements.txt     # Python dependency file
 │   ├── Dockerfile           # Dockerfile for the Streamlit application
 │   └── README.md            # Project documentation
@@ -38,7 +38,7 @@ It should be noted that if you are running locally there is no need to specify t
 ## Launch the application
 ### Local with streamlit
 ```
-streamlit run streamlit/streamlit.py
+streamlit run streamlit/main.py
 ```
 ### With Docker
 Building the image: 
