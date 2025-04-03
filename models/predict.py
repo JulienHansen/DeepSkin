@@ -13,9 +13,6 @@ from PIL import Image, ImageFile
 from torchvision import transforms
 from .model import MultiModalLesionClassifier  # Ensure this import matches your project structure
 import pandas as pd
-import ssl
-
-ssl._create_default_https_context = ssl._create_unverified_context
 
 # Mapping from index to class names for HAM10000
 INDEX_TO_CLASS = {
