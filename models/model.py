@@ -23,7 +23,6 @@ Example:
 import torch
 from torch import nn
 from torchvision import models
-from torchvision.models import ResNet18_Weights
 
 class MultiModalLesionClassifier(nn.Module):
     """
