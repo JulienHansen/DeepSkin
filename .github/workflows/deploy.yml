@@ -121,3 +121,10 @@ jobs:
             --allow-unauthenticated \
             --set-env-vars BACKEND_URL=${{ needs.deploy-backend.outputs.BACKEND_URL }} \
             --port 8501 
+  
+  pytest:
+    needs:
+      - deploy-frontend
+    uses: ./.github/workflows/pytest.yml
+    with:
+      BACKEND_URL: ${{ needs.deploy-backend.outputs.BACKEND_URL }}
