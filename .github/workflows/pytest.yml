@@ -1,6 +1,11 @@
 name: Pytest unit tests
 
-on: [workflow_call]
+on:
+  workflow_call:
+    inputs:
+      BACKEND_URL:
+        required: true
+        type: string
 
 jobs: 
   pytest:

@@ -123,10 +123,9 @@ jobs:
             --port 8501 
   
   pytest:
-    name: Pytest unit tests
-    runs-on: ubuntu-latest
     needs:
       - deploy-frontend
+      - deploy-backend
     uses: ./.github/workflows/pytest.yml
-    #with:
-    #  BACKEND_URL: ${{ needs.deploy-backend.outputs.BACKEND_URL }}
+    with:
+      BACKEND_URL: ${{ needs.deploy-backend.outputs.BACKEND_URL }}
