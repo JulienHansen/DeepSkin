@@ -123,6 +123,8 @@ jobs:
             --port 8501 
   
   pytest:
+    name: Pytest unit tests
+    runs-on: ubuntu-latest
     needs:
       - deploy-frontend
     uses: ./.github/workflows/pytest.yml
