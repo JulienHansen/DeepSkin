@@ -126,5 +126,5 @@ jobs:
     needs:
       - deploy-frontend
     uses: ./.github/workflows/pytest.yml
-    with:
+    env:
       BACKEND_URL: ${{ needs.deploy-backend.outputs.BACKEND_URL }}
