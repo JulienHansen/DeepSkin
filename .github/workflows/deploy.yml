@@ -6,11 +6,13 @@ on:
       - develop
       - main
       - pylint
+      - pytest_local
   push: 
     branches:
       - develop
       - main
       - pylint
+      - pytest_local
 
 jobs: 
   pylint:
