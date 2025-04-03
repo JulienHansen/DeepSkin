@@ -5,7 +5,7 @@
 import requests
 import os
 
-BACKEND_URL = os.getenv("BACKEND_URL", "https://deepskin-back-ster3eab3q-ew.a.run.app")
+BACKEND_URL = os.getenv("BACKEND_URL")
 
 import requests
 
