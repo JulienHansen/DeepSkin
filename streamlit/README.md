@@ -1,6 +1,6 @@
-# DeepSkin - Frontend
+# 🩺 DeepSkin - Frontend
 
-## Description
+## 📌 Description
 Deepskin is a streamlit application for analysing skin images to detect different classes of skin lesions such as : 
 
     - Actinic Keratoses / Bowen's Disease (akiec)
@@ -10,9 +10,9 @@ Deepskin is a streamlit application for analysing skin images to detect differen
     - Melanoma (mel)
     - Melanocytic Nevi (nv)
     - Vascular Lesions (vasc)
-The application also includes a dashboard for viewing performance metrics (CPU, RAM, number of requests, latency) from Google Cloud Run
+The application also includes a dashboard 📊 for viewing performance metrics (CPU, RAM, number of requests, latency) from Google Cloud Run
 
-## Project structure
+## 📁 Project structure
 
 ```
 .
@@ -23,13 +23,13 @@ The application also includes a dashboard for viewing performance metrics (CPU, 
 │   └── README.md            # Project documentation
 ```
 
-## Installation
-### Prerequisites 
-- Python
-- Docker
-- Cloud account with API Monitoring enabled
+## :wrench: Installation
+### ✅ Prerequisites 
+- 🐍 Python
+- 🐳 Docker
+- ☁️ Cloud account with API Monitoring enabled
 
-### Configuration
+### 🔧 Configuration
 Create an environment file with the following variable:
 ```
 BACKEND_URL=http://localhost:5100
@@ -52,17 +52,17 @@ docker run -p 8501:8501 deepskin-front
 ```
 Access the interface via: http://localhost:8501
 
-## Functionality
-### Prediction page
+## 🎯 Functionality
+### 🔍 Prediction page
 - Choice of age, sex and location of lesion
 - Download the type of skin lesion with a detailed explanation
 - Display of the image with the analysis result
 
-### Dashboard page
-- Selecting a time interval for displaying metrics
-- View Cloud Run metrics: 
-    - CPU usage
-    - RAM usage
-    - Number of requests 
-    - Request latency
+### 📊 Dashboard page
+- 🕒 Selecting a time interval for displaying metrics
+- 📡 View Cloud Run metrics: 
+    - 🚀 CPU usage
+    - 🖥️ RAM usage
+    - 🔄 Number of requests 
+    - ⏳ Request latency
  
