@@ -34,7 +34,9 @@ The script main_vertex.py launches the training job on Vertex AI using the follo
 
 Initialize Vertex AI SDK:
 
+```python
 aiplatform.init(project=PROJECT_ID, staging_bucket=BUCKET_URI)
+```
 
 Define a custom training job:
 
