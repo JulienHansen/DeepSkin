@@ -74,6 +74,5 @@ This allows us to retrieve and deploy the model easily.
 🔄 CI/CD: Automatic Training
 
 To automate training, we integrate CI/CD pipelines that:
-✅ Automatically package and upload code updates.
-✅ Trigger Vertex AI training when changes are detected.
+✅ Automatically package and upload trained model when the commit message starts with !train_vertex! .
 ✅ Deploy the latest trained models.
