@@ -1,18 +1,21 @@
 """
-This module provides functions for loading a pre-trained base model and making predictions on images.
+This module provides functions for loading a pre-trained base model and making 
+predictions on images.
 
 Functions:
-- load_model(checkpoint_path, device=None): Load a pre-trained base model from the specified checkpoint path.
+- load_model(input_checkpoint_path, device=None): Load a pre-trained base model from 
+  the specified checkpoint path.
 - predict(model, image, metadata): Make predictions using both image and metadata.
 """
 
 import base64
 import io
+import os
 import torch
-from PIL import Image, ImageFile
+from PIL import Image, ImageFile, UnidentifiedImageError
 from torchvision import transforms
-from .model import MultiModalLesionClassifier  # Ensure this import matches your project structure
 import pandas as pd
+from .model import MultiModalLesionClassifier  # Ensure this import matches your project structure
 
 # Mapping from index to class names for HAM10000
 INDEX_TO_CLASS = {
@@ -22,12 +25,12 @@ INDEX_TO_CLASS = {
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-def load_model(checkpoint_path, device=None):
+def load_model(input_checkpoint_path, device=None):
     """
     Load a pre-trained base model for HAM10000 classification from a specified checkpoint path.
 
     Args:
-        checkpoint_path (str): Local path to the model checkpoint.
+        input_checkpoint_path (str): Local path to the model checkpoint.
         device (torch.device, optional): Device to load the model onto.
 
     Returns:
@@ -37,24 +40,29 @@ def load_model(checkpoint_path, device=None):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Initialize the base model
-    model = MultiModalLesionClassifier(num_meta_features=3, num_classes=7)
-    model.to(device)
+    loaded_model = MultiModalLesionClassifier(num_meta_features=3, num_classes=7)
+    loaded_model.to(device)
 
     # Load checkpoint
-    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+    checkpoint = torch.load(input_checkpoint_path, map_location=device, weights_only=False)
 
     # Filter out mismatched keys
-    model_dict = model.state_dict()
-    filtered_dict = {k: v for k, v in checkpoint['model_state_dict'].items() if k in model_dict and v.size() == model_dict[k].size()}
+    model_dict = loaded_model.state_dict()
+    if not isinstance(model_dict, dict):
+        raise TypeError(
+            f"Expected 'model_dict' to be a dictionary, but got type: {type(model_dict)}"
+        )
+    filtered_dict = {k: v for k, v in checkpoint['model_state_dict'].items()
+                     if k in model_dict and v.size() == model_dict[k].size()}
 
     # Update the existing model's state_dict
     model_dict.update(filtered_dict)
 
     # Load the new state_dict
-    model.load_state_dict(model_dict)
+    loaded_model.load_state_dict(model_dict)
 
-    model.eval()
-    return model
+    loaded_model.eval()
+    return loaded_model
 
 def preprocess_image(image):
     """
@@ -76,19 +84,21 @@ def preprocess_image(image):
             try:
                 decoded = base64.b64decode(image)
                 image = Image.open(io.BytesIO(decoded)).convert('RGB')
-            except Exception as e:
-                raise ValueError("The string provided is neither a valid file path nor a proper base64 encoded image.") from e
+            except Exception as error:
+                raise ValueError("The string provided is neither a valid file"
+                                "path nor a proper base64 encoded image.") from error
     elif isinstance(image, bytes):
         # Try opening the bytes directly.
         try:
             image = Image.open(io.BytesIO(image)).convert('RGB')
-        except Exception:
+        except UnidentifiedImageError:
             # If that fails, assume the bytes are actually base64-encoded.
             try:
                 decoded = base64.b64decode(image)
                 image = Image.open(io.BytesIO(decoded)).convert('RGB')
-            except Exception as e:
-                raise ValueError("The bytes provided are neither a valid raw image nor a proper base64 encoded image.") from e
+            except Exception as error:
+                raise ValueError("The bytes provided are neither a valid raw image"
+                                "nor a proper base64 encoded image.") from error
     else:
         raise TypeError("Unsupported type for image. Must be bytes or str.")
 
@@ -116,16 +126,16 @@ def preprocess_metadata(age, sex, localization):
     """
     # Ensure age is a float
     age = float(age)  # Convert to float if it isn't already
-    
+
     age = age / 100.0  # Normalize age
     sex = 0.0 if sex.lower() == 'male' else 1.0  # Encode sex
     localization_code = pd.Categorical([localization]).codes[0]  # Encode localization
-    
+
     metadata = torch.tensor([[age, sex, localization_code]], dtype=torch.float32)
     return metadata
 
 
-def predict(model, image, metadata, device=None):
+def predict(input_model, image, metadata, device=None):
     """
     Make predictions using both image and metadata.
 
@@ -139,20 +149,20 @@ def predict(model, image, metadata, device=None):
         dict: Predicted probabilities for each class.
     """
     if device is None:
-        device = next(model.parameters()).device
+        device = next(input_model.parameters()).device
 
     image_tensor = preprocess_image(image).to(device)
     metadata_tensor = preprocess_metadata(*metadata).to(device)
 
     with torch.no_grad():
-        output = model(image_tensor, metadata_tensor)
+        output = input_model(image_tensor, metadata_tensor)
         output = torch.nn.functional.softmax(output, dim=1)
 
     return {INDEX_TO_CLASS[i]: output[0][i].item() for i in range(len(output[0]))}
 
 if __name__ == '__main__':
-    checkpoint_path = 'models/checkpoints/final_model.pt'  # Path to your base model checkpoint
-    model = load_model(checkpoint_path)
+    CHECKPOINT_PATH = 'models/checkpoints/final_model.pt'  # Path to your base model checkpoint
+    model = load_model(CHECKPOINT_PATH)
 
     with open("models/ISIC_0024306.jpg", "rb") as f:
         encoded_image = base64.b64encode(f.read())
