@@ -51,3 +51,4 @@ data/
 # Secrets
 credentials.json
 
+final_model.pt
