@@ -1,7 +1,7 @@
 waitress
-torchvision
+torchvision==0.20
 Pillow
-torch
+torch==2.5
 flask
 numpy
 pandas
@@ -9,3 +9,6 @@ requests
 gunicorn
 google-cloud-storage
 google-cloud-aiplatform
+matplotlib
+tqdm
+gcsfs

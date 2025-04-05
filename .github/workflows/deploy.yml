@@ -12,8 +12,12 @@ on:
 
 
 jobs: 
+  pylint:
+    uses: ./.github/workflows/pylint.yml
+
   deploy-backend:
     runs-on: ubuntu-latest
+    needs: pylint
     outputs:
       BACKEND_URL: ${{ steps.deploy-backend.outputs.BACKEND_URL }}
 
@@ -116,3 +120,11 @@ jobs:
             --allow-unauthenticated \
             --set-env-vars BACKEND_URL=${{ needs.deploy-backend.outputs.BACKEND_URL }} \
             --port 8501 
+  
+  pytest:
+    needs:
+      - deploy-frontend
+      - deploy-backend
+    uses: ./.github/workflows/pytest.yml
+    with:
+      BACKEND_URL: ${{ needs.deploy-backend.outputs.BACKEND_URL }}
