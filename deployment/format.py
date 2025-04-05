@@ -22,3 +22,4 @@ try:
 except json.JSONDecodeError as e:
     print(f"Erreur de décodage JSON : {e}")
     sys.exit(1)
+    

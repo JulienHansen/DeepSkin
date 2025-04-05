@@ -26,8 +26,8 @@ import pandas as pd
 import requests
 import streamlit as st
 
-
-
+client = monitoring_v3.MetricServiceClient()
+PROJECT_NAME = "projects/deepskin-451908"
 
 HIDE_STREAMLIT_STYLE = """
 <style>
@@ -212,8 +212,6 @@ if page == "Prediction":
 
 
 elif page == "Dashboard":
-    client = monitoring_v3.MetricServiceClient()
-    PROJECT_NAME = "projects/deepskin-451908"
 
     st.title("Monitoring des métriques Cloud Run")
 
