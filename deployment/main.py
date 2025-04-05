@@ -1,9 +1,18 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
-from models.predict import load_model, predict
-from google.cloud import storage
+"""
+This file contains the main Flask application code for the DeepSkin project.
+It includes :
+- The download of the model from Google Cloud Storage.
+- An API for predicting classes from images and metadata.
+- A simple user interface to test the API.
+Usage:
+    Run this script to start the Flask server.
+"""
+import logging
 import os
+from flask import Flask, render_template, request, jsonify, redirect, url_for
+from google.cloud import storage
 from PIL import Image
-import io
+from models.predict import load_model, predict
 
 # Configuration for the API and GCS
 HOST = "0.0.0.0"
@@ -17,8 +26,18 @@ LOCAL_MODEL_PATH = "final_model.pt"
 # Initialize Flask App
 app = Flask(__name__)
 
-# Function to download the model from GCS
 def download_model_from_gcs(bucket_uri, model_blob_name, local_path):
+    """
+    Downloads a model from a Google Cloud Storage (GCS) bucket and saves it locally.
+
+    Args:
+        bucket_uri (str): The URI of the GCS bucket (for example, ‘gs://my_bucket’).
+        model_blob_name (str): The name of the blob (file) in the bucket.
+        local_path (str): The local path where the file will be saved.
+
+    Returns:
+        None
+    """
     bucket_name = bucket_uri.replace("gs://", "")
     client = storage.Client()
     bucket = client.bucket(bucket_name)
@@ -30,8 +49,6 @@ def download_model_from_gcs(bucket_uri, model_blob_name, local_path):
 download_model_from_gcs(MODEL_BUCKET_URI, MODEL_BLOB_NAME, LOCAL_MODEL_PATH)
 model = load_model(LOCAL_MODEL_PATH)
 
-import logging
-
 # Ensure the static directory exists
 static_dir = os.path.join(os.getcwd(), 'static')
 if not os.path.exists(static_dir):
@@ -39,26 +56,42 @@ if not os.path.exists(static_dir):
 
 @app.route("/predict", methods=["POST"])
 def predict_endpoint():
+    """
+    Endpoint to make a prediction from an image and metadata.
+
+    This function receives a POST request containing an image and metadata 
+    (age, gender, location). It performs the following steps:
+    - Checks the presence and format of the image.
+    - Validates the image to ensure it is correct.
+    - Reads the metadata provided in the request.
+    - Calls the prediction function with the image and metadata.
+    - Returns the results of the prediction as JSON.
+
+    Returns:
+        Response: A JSON response containing :
+            - The class predicted with the highest probability.
+            - The probabilities for each class.
+            - The metadata provided.
+        In the event of an error, returns an error message with an appropriate HTTP code.
+    """
     if "image" not in request.files:
         return jsonify({"error": "No image provided"}), 400
-    
     age = request.form.get("age")
     sex = request.form.get("sex")
 
     # Extract the image file
     image_file = request.files["image"]
-    
     # Save the image temporarily for debugging
     temp_image_path = os.path.join(static_dir, 'temp_uploaded_image.jpg')
     image_file.save(temp_image_path)
 
     # Log image details for debugging
-    logging.debug(f"Image filename: {image_file.filename}")
-    logging.debug(f"Image content type: {image_file.content_type}")
-    
+    logging.debug("Image filename: %s", image_file.filename)
+    logging.debug("Image content type: %s", image_file.content_type)
+
     # Check if the content type is valid
     if image_file.content_type not in ["image/jpeg", "image/png", "image/jpg"]:
-        logging.error(f"Unsupported image format: {image_file.content_type}")
+        logging.error("Unsupported image format: %s", image_file.content_type)
         return jsonify({"error": "Unsupported image format. Please upload a JPG or PNG file."}), 400
 
     try:
@@ -66,13 +99,12 @@ def predict_endpoint():
         image = Image.open(temp_image_path)  # Use the saved image path here
         image.verify()  # This will check if the image is valid
         image = Image.open(temp_image_path)  # Re-read it after verify() for further processing
-    except (IOError, SyntaxError) as e:
-        logging.error(f"Image is invalid: {e}")
+    except (IOError, SyntaxError) as error:
+        logging.error("Image is invalid: %s", error)
         return jsonify({"error": "Invalid image file"}), 400
 
     # Rewind the file pointer again for further usage
     image_file.seek(0)
-    
     # Read the image as bytes for further processing
     image_bytes = image_file.read()
 
@@ -92,7 +124,6 @@ def predict_endpoint():
     image_file.seek(0)  # Rewind the file pointer before saving
     image_file.save(os.path.join(static_dir, 'uploaded_image.jpg'))  # Save the image temporarily
 
-    
     return jsonify({
         "prediction": max(prediction, key=prediction.get),  # Classe avec la plus grande proba
         "probabilities": prediction,
@@ -103,23 +134,23 @@ def predict_endpoint():
         }
     })
 
-    return render_template(
-        'result.html',
-        prediction=prediction,
-        image_url='/static/uploaded_image.jpg',
-        age=age,
-        sex=sex,
-        localization=localization
-    )
-
-
 # Simple frontend to test the API
 @app.route("/", methods=["GET", "POST"])
 def submit():
+    """
+    Home page for testing the API.
+
+    This function handles GET and POST requests for the welcome page:
+    - In the event of a GET request, it displays an HTML page (welcome.html) for submitting a form.
+    - In the event of a POST request (form submission), it redirects to the prediction endpoint.
+
+    Returns:
+        Response: An HTML page for GET requests or a redirection to the prediction endpoint 
+        for POST requests.
+    """
     if request.method == "POST":
         # Form submitted, call the predict endpoint
         return redirect(url_for('predict_endpoint'))
-    
     return render_template("welcome.html")
 
 if __name__ == '__main__':
