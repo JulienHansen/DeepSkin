@@ -5,12 +5,11 @@ on:
     branches:
       - develop
       - main
-      - pylint
   push: 
     branches:
       - develop
       - main
-      - pylint
+
 
 jobs: 
   pylint:

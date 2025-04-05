@@ -10,13 +10,6 @@ Skin cancer is one of the most common forms of cancer, and early detection is cr
 
 By filtering out benign cases, DeepSkin helps reduce unnecessary dermatology visits while ensuring that high-risk cases receive urgent medical attention. This not only improves patient outcomes but also optimizes healthcare resources by allowing medical professionals to focus on cases that require immediate intervention.
 
-## :bulb: Value Proposition
-
-- **Easy-to-use Interface**: No medical expertise required; users simply upload an image.
-- **Risk Assessment**: The model provides a classification and a confidence score.
-- **Reduced Unnecessary Visits**: Helps users identify benign cases while ensuring high-risk cases get urgent attention.
-- **Cloud-Based Solution**: Accessible anywhere, anytime.
-
 ## :stethoscope: Our Team
 
 The DeepSkin Team is composed of 4 members:
@@ -111,5 +104,5 @@ Inference will be performed in real-time using the deployed model on **Google Cl
 | 5.2  | W10  | Build and deploy a simple UI/dashboard to showcase results. | ✅ | - | Optional |
 | 6.1  | W10  | Build a CI/CD pipeline (e.g., GitHub Actions) with at least one automated step. | ✅ | - | Required |
 | 6.2  | W10  | CI/CD step: Auto-deploy model serving components. | ✅ | - | Optional |
-| 6.3  | W10  | CI/CD step: Run Pylint for code quality checks. | ❌ | - | Optional |
-| 6.4  | W10  | CI/CD step: Run Pytest for unit tests. | ❌ | - | Optional |
+| 6.3  | W10  | CI/CD step: Run Pylint for code quality checks. | ⏳  | - | Optional |
+| 6.4  | W10  | CI/CD step: Run Pytest for unit tests. | ⏳  | - | Optional |
