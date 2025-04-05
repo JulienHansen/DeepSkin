@@ -20,15 +20,15 @@
 
 ### Features
 
-    Accepts JPG/PNG images as input.
+    - Accepts JPG/PNG images as input.
 
-    Includes age, sex, and localization metadata to enhance prediction accuracy.
+    - Includes age, sex, and localization metadata to enhance prediction accuracy.
 
-    Uses a deep learning model stored in GCS to classify skin conditions.
+    - Uses a deep learning model stored in GCS to classify skin conditions.
 
-    Returns a JSON response with the predicted class and associated probabilities.
+    - Returns a JSON response with the predicted class and associated probabilities.
 
-    Includes a simple web interface for testing the API.
+    - Includes a simple web interface for testing the API.
 
 ### Endpoints
 
@@ -38,13 +38,13 @@ POST /predict
 
     Request:
 
-    image (file, required): A JPG or PNG image of the skin condition.
+    - image (file, required): A JPG or PNG image of the skin condition.
 
-    age (string, optional): Patient’s age.
+    - age (string, optional): Patient’s age.
 
-    sex (string, optional): Patient’s gender.
+    - sex (string, optional): Patient’s gender.
 
-    localization (string, optional): Location of the skin condition on the body.
+    - localization (string, optional): Location of the skin condition on the body.
 
     Response:
 ```json
@@ -71,11 +71,11 @@ GET /
 
 ### Prerequisites
 
-Python 3.x
+- Python 3.10
 
-Flask
+- Flask
 
-Google Cloud SDK configured with access to the model bucket
+- Google Cloud SDK configured with access to the model bucket
 
 ### Installation
 
@@ -91,9 +91,9 @@ python main.py
 
 ### Notes
 
-The API downloads the model (final_model.pt) from Google Cloud Storage on startup.
+- The API downloads the model (final_model.pt) from Google Cloud Storage on startup.
 
-Uploaded images are temporarily saved in the static/ directory for debugging.
+- Uploaded images are temporarily saved in the static/ directory for debugging.
 
-Logging is enabled to help diagnose issues with image uploads.
+- Logging is enabled to help diagnose issues with image uploads.
 
