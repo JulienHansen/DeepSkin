@@ -1,19 +1,37 @@
+"""
+This module contains the training script for the DeepSkin project.
+
+It includes:
+- A `train` function to train the MultiModalLesionClassifier model.
+- Argument parsing for configuring training parameters such as learning rate, batch size,
+  and epochs.
+- Dataset preparation and DataLoader creation for the HAM10000 dataset.
+- Checkpoint saving during training and optional upload of the final model to Google Cloud Storage.
+
+Usage:
+    Run this script to train the model:
+    python train.py --data_path <path_to_data> --save_path <path_to_save_model> [other arguments]
+
+Example:
+    python train.py --data_path ./data --save_path ./checkpoints --epochs 50 --batch_size 32
+"""
+
 import os
 import time
-import gcsfs  
+import sys
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
 
 from tqdm import tqdm
-from models.model import MultiModalLesionClassifier 
-from models.data_loader import get_dataloader, HAM10000ImageDataset
 from torchvision import transforms
+from models.model import MultiModalLesionClassifier
+from models.data_loader import get_dataloader, HAM10000ImageDataset
 from models.args_train import get_args_parser
-from models.utils import plot_losses, download_from_gcs, upload_trained_model, save_final_model
+from models.utils import download_from_gcs, upload_trained_model, save_final_model
 
 
-def train(model, train_loader, test_loader, optimizer, criterion, epochs, device, save_freq, save_path):
+def train(input_model, input_train_loader, input_test_loader, input_optimizer,
+          input_criterion, epochs, input_device, save_freq, save_path):
     """
     Train the multi-modal lesion classification model.
     """
@@ -22,30 +40,35 @@ def train(model, train_loader, test_loader, optimizer, criterion, epochs, device
 
     for epoch in tqdm(range(epochs), desc="Training"):
         epoch_start = time.time()
-        model.train()
+        input_model.train()
         train_losses, train_accs = [], []
 
         # Training loop
-        for images, metadata, labels in train_loader:
-            images, metadata, labels = images.to(device), metadata.to(device), labels.to(device)
-            outputs = model(images, metadata)
-            loss = criterion(outputs, labels)
+        for images, metadata, labels in input_train_loader:
+            images = images.to(input_device)
+            metadata = metadata.to(input_device)
+            labels = labels.to(input_device)
 
-            optimizer.zero_grad()
+            outputs = input_model(images, metadata)
+            loss = input_criterion(outputs, labels)
+
+            input_optimizer.zero_grad()
             loss.backward()
-            optimizer.step()
+            input_optimizer.step()
 
             train_losses.append(loss.item())
             train_accs.append((outputs.argmax(dim=1) == labels).float().mean().item())
 
         # Evaluation loop
-        model.eval()
+        input_model.eval()
         test_losses, test_accs = [], []
         with torch.no_grad():
-            for images, metadata, labels in test_loader:
-                images, metadata, labels = images.to(device), metadata.to(device), labels.to(device)
-                outputs = model(images, metadata)
-                loss = criterion(outputs, labels)
+            for images, metadata, labels in input_test_loader:
+                images = images.to(input_device)
+                metadata = metadata.to(input_device)
+                labels = labels.to(input_device)
+                outputs = input_model(images, metadata)
+                loss = input_criterion(outputs, labels)
                 test_losses.append(loss.item())
                 test_accs.append((outputs.argmax(dim=1) == labels).float().mean().item())
 
@@ -65,8 +88,8 @@ def train(model, train_loader, test_loader, optimizer, criterion, epochs, device
             checkpoint_path = os.path.join(save_path, f"model_epoch_{epoch+1}.pt")
             torch.save({
                 'epoch': epoch + 1,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
+                'model_state_dict': input_model.state_dict(),
+                'optimizer_state_dict': input_optimizer.state_dict(),
                 'train_loss': avg_train_loss,
                 'test_loss': avg_test_loss,
                 'train_acc': avg_train_acc,
@@ -93,10 +116,12 @@ if __name__ == '__main__':
         CSV_FILE = os.path.join(args.data_path, 'HAM10000_metadata.csv')
         IMAGES_PATH_1 = os.path.join(args.data_path, 'HAM10000_images_part_1')
         IMAGES_PATH_2 = os.path.join(args.data_path, 'HAM10000_images_part_2')
-    
+
     device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
-    num_meta_features = 3  # 'age', 'sex', and 'localization'
-    num_classes = 7        
+
+    #'age', 'sex', and 'localization'
+    NUM_MATE_FEATURES = 3
+    NUM_CLASSES = 7
 
     transform_pipeline = transforms.Compose([
         transforms.Resize((args.img_size, args.img_size)),
@@ -104,31 +129,32 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
                              std=[0.229, 0.224, 0.225])
     ])
-    
+
     print("OK1")
     dataset = HAM10000ImageDataset(CSV_FILE, IMAGES_PATH_1, IMAGES_PATH_2,
                                    transform=transform_pipeline, max_samples=args.max_samples)
     print("OK2")
 
-    train_loader, test_loader = get_dataloader(dataset, batch_size=args.batch_size, train_split=args.train_prop)
+    train_loader, test_loader = get_dataloader(dataset, batch_size=args.batch_size,
+                                               train_split=args.train_prop)
 
-    model = MultiModalLesionClassifier(num_meta_features, num_classes).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    MODEL = MultiModalLesionClassifier(NUM_MATE_FEATURES, NUM_CLASSES).to(device)
+    optimizer = torch.optim.Adam(MODEL.parameters(), lr=args.lr)
     criterion = torch.nn.CrossEntropyLoss()
-    
+
     SAVE_PATH = args.save_path
     os.makedirs(SAVE_PATH, exist_ok=True)
-    
+
     # Start training
-    train(model, train_loader, test_loader, optimizer, criterion, 
-          epochs=args.epochs, device=device, save_freq=args.save_freq, save_path=SAVE_PATH)
-    
+    train(MODEL, train_loader, test_loader, optimizer, criterion,
+          epochs=args.epochs, input_device=device, save_freq=args.save_freq, save_path=SAVE_PATH)
+
     # Save the final model locally as "final_model.pt"
-    final_model_local_path = save_final_model(model, SAVE_PATH)
-    
+    final_model_local_path = save_final_model(MODEL, SAVE_PATH)
+
     # If --on_cloud flag is provided, upload the final model to the cloud.
     if args.on_cloud:
         if not args.cloud_save_path.startswith("gs://"):
             print("Error: --cloud_save_path must be a valid GCS path (e.g. gs://bucket/path).")
-            exit(1)
+            sys.exit(1)
         upload_trained_model(final_model_local_path, args.cloud_save_path)
