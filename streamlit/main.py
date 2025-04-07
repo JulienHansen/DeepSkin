@@ -106,7 +106,7 @@ def get_metrics(metric_filter: str, metric_label: str, input_interval_seconds: i
     return usage_percent, times
 
 
-page = st.sidebar.selectbox("Choisissez une page", options=list(PAGES.keys()))
+page = st.sidebar.selectbox("Choose a page", options=list(PAGES.keys()))
 
 if page == "Prediction":
 
@@ -146,7 +146,7 @@ if page == "Prediction":
         },
     }
 
-    with st.expander("Détails de tous les diagnostics possibles"):
+    with st.expander("Details of all possible diagnoses"):
         for key, value in diagnosis_info.items():
             st.write(f"### {value['name']}")
             st.write(value["description"])
@@ -155,19 +155,19 @@ if page == "Prediction":
     # API URL
     API_URL = f"{BACKEND_URL}/predict"
 
-    st.title("Analyse de la peau avec IA")
+    st.title("Skin analysis with AI")
 
-    age = st.number_input("Âge", min_value=0, max_value=120)
+    age = st.number_input("Age", min_value=0, max_value=120)
     sex = st.selectbox("Sexe", ["male", "female"])
     localizations = [
         'scalp', 'ear', 'face', 'back', 'trunk', 'chest', 'upper extremity', 'abdomen',
         'unknown', 'lower extremity', 'genital', 'neck', 'hand', 'foot', 'acral'
     ]
-    localization = st.selectbox("Localisation", localizations)
+    localization = st.selectbox("Localization", localizations)
 
-    uploaded_file = st.file_uploader("Téléchargez une image", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
-    if st.button("Analyser l'image"):
+    if st.button("Analyze the image"):
         if uploaded_file is not None:
             files = {"image": (uploaded_file.name, uploaded_file, uploaded_file.type)}
             data = {"age": age, "sex": sex, "localization": localization}
@@ -177,9 +177,9 @@ if page == "Prediction":
 
             if response.status_code == 200:
                 result = response.json()
-                st.image(uploaded_file, caption="Image téléchargée", use_container_width=True)
-                st.write("### Résultat de l'analyse")
-                st.write(f"**Classe prédite :** {result['prediction']}")
+                st.image(uploaded_file, caption="Uploaded image", use_container_width=True)
+                st.write("### Analysis Result")
+                st.write(f"**Predicted class :** {result['prediction']}")
 
                 #st.write("#### Détails des probabilités")
                 #st.json(result.get("probabilities", {}))
@@ -190,7 +190,7 @@ if page == "Prediction":
                                                                         "Probabilité"])
 
                 # Affichage du titre
-                st.write("#### Détails des probabilités")
+                st.write("#### Details of probabilities")
 
                 # Affichage du tableau avec les barres de progression
                 for index, row in df.iterrows():
@@ -206,17 +206,17 @@ if page == "Prediction":
                         # Affiche le pourcentage en chiffres
                         st.write(f"{row['Probabilité']*100:.6f}%")
             else:
-                st.error(f"Erreur: {response.json().get('error', 'Erreur inconnue')}")
+                st.error(f"Error: {response.json().get('error', 'Uknown error')}")
         else:
-            st.warning("Veuillez télécharger une image avant d'analyser.")
+            st.warning("Please upload an image before analyzing.")
 
 
 elif page == "Dashboard":
 
-    st.title("Monitoring des métriques Cloud Run")
+    st.title("Monitoring Cloud Run metrics")
 
     interval_choice = st.selectbox(
-    "Choisir l'intervalle de temps",
+    "Choose the time interval",
     ["24 heures", "1 heure", "5 minutes"]
     )
 

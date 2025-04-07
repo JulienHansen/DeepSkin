@@ -134,25 +134,5 @@ def predict_endpoint():
         }
     })
 
-# Simple frontend to test the API
-@app.route("/", methods=["GET", "POST"])
-def submit():
-    """
-    Home page for testing the API.
-
-    This function handles GET and POST requests for the welcome page:
-    - In the event of a GET request, it displays an HTML page (welcome.html) for submitting a form.
-    - In the event of a POST request (form submission), it redirects to the prediction endpoint.
-
-    Returns:
-        Response: An HTML page for GET requests or a redirection to the prediction endpoint 
-        for POST requests.
-    """
-    if request.method == "POST":
-        # Form submitted, call the predict endpoint
-        return redirect(url_for('predict_endpoint'))
-    return render_template("welcome.html")
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=5100)
-    
