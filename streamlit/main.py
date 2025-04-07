@@ -25,6 +25,7 @@ from google.cloud import monitoring_v3
 import pandas as pd
 import requests
 import streamlit as st
+import pytz
 
 client = monitoring_v3.MetricServiceClient()
 PROJECT_NAME = "projects/deepskin-451908"
@@ -105,10 +106,60 @@ def get_metrics(metric_filter: str, metric_label: str, input_interval_seconds: i
 
     return usage_percent, times
 
-
+st.sidebar.image("./.github/pictures/logo-bg.png",use_container_width=True)
 page = st.sidebar.selectbox("Choose a page", options=list(PAGES.keys()))
 
+
 if page == "Prediction":
+
+    st.markdown("""
+        <style>
+        .custom-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #0e1117; /* Couleur du fond (tu peux la changer) */
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 24px;
+            z-index: 9999;
+            border-bottom: 1px solid #444;
+        }
+
+        /* Ajoute un padding pour éviter que le header recouvre le contenu */
+        .main > div {
+            padding-top: 80px; /* Ajuste selon la hauteur de ton header */
+        }
+        </style>
+
+        <div class="custom-header">
+            🔬 DeepSkin - Analyse d'images de la peau avec IA
+        </div>
+    """, unsafe_allow_html=True)
+
+    header = st.container()
+    header.title("Skin analysis with AI 🔬")
+    header.write("""<div class='fixed-header'/>""", unsafe_allow_html=True)
+
+    st.markdown(
+        """
+    <style>
+        div[data-testid="stVerticalBlock"] div:has(div.fixed-header) {
+            position: sticky;
+            top: 2.875rem;
+            background-color: white;
+            z-index: 999;
+        }
+        .fixed-header {
+            border-bottom: 1px solid black;
+        }
+    </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 
     diagnosis_info = {
         "akiec": {
@@ -155,7 +206,7 @@ if page == "Prediction":
     # API URL
     API_URL = f"{BACKEND_URL}/predict"
 
-    st.title("Skin analysis with AI")
+    #st.title("Skin analysis with AI")
 
     age = st.number_input("Age", min_value=0, max_value=120)
     sex = st.selectbox("Sexe", ["male", "female"])
@@ -213,7 +264,28 @@ if page == "Prediction":
 
 elif page == "Dashboard":
 
-    st.title("Monitoring Cloud Run metrics")
+    header = st.container()
+    header.title("Monitoring Cloud Run metrics 🖥️")
+    header.write("""<div class='fixed-header'/>""", unsafe_allow_html=True)
+
+    st.markdown(
+        """
+    <style>
+        div[data-testid="stVerticalBlock"] div:has(div.fixed-header) {
+            position: sticky;
+            top: 2.875rem;
+            background-color: white;
+            z-index: 999;
+        }
+        .fixed-header {
+            border-bottom: 1px solid black;
+        }
+    </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    #st.title("Monitoring Cloud Run metrics")
 
     interval_choice = st.selectbox(
     "Choose the time interval",
@@ -243,10 +315,12 @@ elif page == "Dashboard":
 
     tab1, tab2, tab3, tab4 = st.tabs(["CPU", "RAM", "Request Count", "Request Latency"])
 
+    brussels_tz = pytz.timezone("Europe/Brussels")
+
     with tab1:
         usage_percent_cpu, times_cpu = get_metrics(CPU_METRIC_FILTER, MATRIC_LABEL_CPU,
                                                    INTERVAL_SECONDS)
-        times_cpu = [datetime.datetime.utcfromtimestamp(time.timestamp()) for time in times_cpu]
+        times_cpu = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) for time in times_cpu]
         df_cpu = pd.DataFrame({"Time": times_cpu, "CPU Usage (%)": usage_percent_cpu})
         st.line_chart(df_cpu.set_index("Time"), height=250)
         st.write(df_cpu)
@@ -254,7 +328,7 @@ elif page == "Dashboard":
     with tab2:
         usage_percent_ram, times_ram = get_metrics(RAM_METRIC_FILTER, MATRIC_LABEL_RAM,
                                                    INTERVAL_SECONDS)
-        times_ram = [datetime.datetime.utcfromtimestamp(time.timestamp()) for time in times_ram]
+        times_ram = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) for time in times_ram]
         df_ram = pd.DataFrame({"Time": times_ram, "RAM Usage (%)": usage_percent_ram})
         st.line_chart(df_ram.set_index("Time"), height=250)
         st.write(df_ram)
@@ -262,8 +336,7 @@ elif page == "Dashboard":
     with tab3:
         usage_percent_request_count, times_request_count = get_metrics(REQUEST_COUNT_METRIC_FILTER,
                                                 METRIC_LABEL_REQUEST_COUNT, INTERVAL_SECONDS)
-        times_request_count = [datetime.datetime.utcfromtimestamp(time.timestamp())
-                               for time in times_request_count]
+        times_request_count = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) for time in times_request_count]
         df_request_count = pd.DataFrame({"Time": times_request_count, "Request Count":
                                          usage_percent_request_count})
         st.line_chart(df_request_count.set_index("Time"), height=250)
@@ -272,8 +345,7 @@ elif page == "Dashboard":
     with tab4:
         usage_percent_request_latency, times_request_latency = get_metrics(
             REQUEST_LATENCY_METRIC_FILTER, MATRIC_LABEL_REQUEST_LATENCY, INTERVAL_SECONDS)
-        times_request_latency = [datetime.datetime.utcfromtimestamp(time.timestamp())
-                                 for time in times_request_latency]
+        times_request_latency = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) for time in times_request_latency]
         df_request_latency = pd.DataFrame({"Time": times_request_latency, "Request Latency (ms)":
                                            usage_percent_request_latency})
         st.line_chart(df_request_latency.set_index("Time"), height=250)
