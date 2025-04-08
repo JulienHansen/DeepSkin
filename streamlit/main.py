@@ -24,8 +24,10 @@ import os
 from google.cloud import monitoring_v3
 import pandas as pd
 import requests
-import streamlit as st
 import pytz
+import streamlit as st
+
+st.set_page_config(layout="wide")
 
 client = monitoring_v3.MetricServiceClient()
 PROJECT_NAME = "projects/deepskin-451908"
@@ -112,33 +114,6 @@ page = st.sidebar.selectbox("Choose a page", options=list(PAGES.keys()))
 
 if page == "Prediction":
 
-    st.markdown("""
-        <style>
-        .custom-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #0e1117; /* Couleur du fond (tu peux la changer) */
-            color: white;
-            text-align: center;
-            padding: 10px;
-            font-size: 24px;
-            z-index: 9999;
-            border-bottom: 1px solid #444;
-        }
-
-        /* Ajoute un padding pour éviter que le header recouvre le contenu */
-        .main > div {
-            padding-top: 80px; /* Ajuste selon la hauteur de ton header */
-        }
-        </style>
-
-        <div class="custom-header">
-            🔬 DeepSkin - Analyse d'images de la peau avec IA
-        </div>
-    """, unsafe_allow_html=True)
-
     header = st.container()
     header.title("Skin analysis with AI 🔬")
     header.write("""<div class='fixed-header'/>""", unsafe_allow_html=True)
@@ -151,6 +126,7 @@ if page == "Prediction":
             top: 2.875rem;
             background-color: white;
             z-index: 999;
+            text-align: center
         }
         .fixed-header {
             border-bottom: 1px solid black;
@@ -205,61 +181,74 @@ if page == "Prediction":
 
     # API URL
     API_URL = f"{BACKEND_URL}/predict"
+    
+    col1, col2 = st.columns([1, 2])
 
-    #st.title("Skin analysis with AI")
+    with col1:
 
-    age = st.number_input("Age", min_value=0, max_value=120)
-    sex = st.selectbox("Sexe", ["male", "female"])
-    localizations = [
-        'scalp', 'ear', 'face', 'back', 'trunk', 'chest', 'upper extremity', 'abdomen',
-        'unknown', 'lower extremity', 'genital', 'neck', 'hand', 'foot', 'acral'
-    ]
-    localization = st.selectbox("Localization", localizations)
+        age = st.number_input("Age", min_value=0, max_value=120)
+        sex = st.selectbox("Sexe", ["male", "female"])
+        localizations = [
+            'scalp', 'ear', 'face', 'back', 'trunk', 'chest', 'upper extremity', 'abdomen',
+            'unknown', 'lower extremity', 'genital', 'neck', 'hand', 'foot', 'acral'
+        ]
+        localization = st.selectbox("Localization", localizations)
 
-    uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+        uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
-    if st.button("Analyze the image"):
-        if uploaded_file is not None:
-            files = {"image": (uploaded_file.name, uploaded_file, uploaded_file.type)}
-            data = {"age": age, "sex": sex, "localization": localization}
-            headers = {"Accept": "application/json"}
+        col3, col4 = st.columns([1, 2])
 
-            response = requests.post(API_URL, files=files, data=data, headers=headers, timeout=10)
+        with col3: 
+            button_analyze = st.button("Analyze the image")
+        with col4:
+            if uploaded_file is not None:
+                st.image(uploaded_file, caption="Uploaded image", width=150)
 
-            if response.status_code == 200:
-                result = response.json()
-                st.image(uploaded_file, caption="Uploaded image", use_container_width=True)
-                st.write("### Analysis Result")
-                st.write(f"**Predicted class :** {result['prediction']}")
+    with col2:
 
-                #st.write("#### Détails des probabilités")
-                #st.json(result.get("probabilities", {}))
+        if button_analyze:
+            if uploaded_file is not None:
+                with st.spinner("🔄 Analyse en cours..."):
+                    files = {"image": (uploaded_file.name, uploaded_file, uploaded_file.type)}
+                    data = {"age": age, "sex": sex, "localization": localization}
+                    headers = {"Accept": "application/json"}
 
-                probabilities = result.get("probabilities", {})
-                # Conversion en DataFrame
-                df = pd.DataFrame(list(probabilities.items()), columns=["Nom de la maladie",
-                                                                        "Probabilité"])
+                    response = requests.post(API_URL, files=files, data=data, headers=headers, timeout=10)
 
-                # Affichage du titre
-                st.write("#### Details of probabilities")
+                    if response.status_code == 200:
+                        result = response.json()
+                        #st.image(uploaded_file, caption="Uploaded image", width=150)
+                        st.write("### Analysis Result")
+                        st.write(f"**Predicted class :** {result['prediction']}")
 
-                # Affichage du tableau avec les barres de progression
-                for index, row in df.iterrows():
-                    col1, col2, col3 = st.columns([2, 3, 1])
+                        #st.write("#### Détails des probabilités")
+                        #st.json(result.get("probabilities", {}))
 
-                    with col1:
-                        st.write(row["Nom de la maladie"])
+                        probabilities = result.get("probabilities", {})
+                        # Conversion en DataFrame
+                        df = pd.DataFrame(list(probabilities.items()), columns=["Nom de la maladie",
+                                                                                "Probabilité"])
 
-                    with col2:
-                        st.progress(row["Probabilité"])  # Affiche une barre de progression
+                        # Affichage du titre
+                        st.write("#### Details of probabilities")
 
-                    with col3:
-                        # Affiche le pourcentage en chiffres
-                        st.write(f"{row['Probabilité']*100:.6f}%")
+                        # Affichage du tableau avec les barres de progression
+                        for index, row in df.iterrows():
+                            col1, col2, col3 = st.columns([2, 3, 1])
+
+                            with col1:
+                                st.write(row["Nom de la maladie"])
+
+                            with col2:
+                                st.progress(row["Probabilité"])  # Affiche une barre de progression
+
+                            with col3:
+                                # Affiche le pourcentage en chiffres
+                                st.write(f"{row['Probabilité']*100:.6f}%")
+                    else:
+                        st.error(f"Error: {response.json().get('error', 'Uknown error')}")
             else:
-                st.error(f"Error: {response.json().get('error', 'Uknown error')}")
-        else:
-            st.warning("Please upload an image before analyzing.")
+                st.warning("Please upload an image before analyzing.")
 
 
 elif page == "Dashboard":
@@ -276,6 +265,7 @@ elif page == "Dashboard":
             top: 2.875rem;
             background-color: white;
             z-index: 999;
+            text-align: center
         }
         .fixed-header {
             border-bottom: 1px solid black;
@@ -320,7 +310,8 @@ elif page == "Dashboard":
     with tab1:
         usage_percent_cpu, times_cpu = get_metrics(CPU_METRIC_FILTER, MATRIC_LABEL_CPU,
                                                    INTERVAL_SECONDS)
-        times_cpu = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) for time in times_cpu]
+        times_cpu = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) 
+                     for time in times_cpu]
         df_cpu = pd.DataFrame({"Time": times_cpu, "CPU Usage (%)": usage_percent_cpu})
         st.line_chart(df_cpu.set_index("Time"), height=250)
         st.write(df_cpu)
@@ -328,7 +319,8 @@ elif page == "Dashboard":
     with tab2:
         usage_percent_ram, times_ram = get_metrics(RAM_METRIC_FILTER, MATRIC_LABEL_RAM,
                                                    INTERVAL_SECONDS)
-        times_ram = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) for time in times_ram]
+        times_ram = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) 
+                     for time in times_ram]
         df_ram = pd.DataFrame({"Time": times_ram, "RAM Usage (%)": usage_percent_ram})
         st.line_chart(df_ram.set_index("Time"), height=250)
         st.write(df_ram)
@@ -336,7 +328,8 @@ elif page == "Dashboard":
     with tab3:
         usage_percent_request_count, times_request_count = get_metrics(REQUEST_COUNT_METRIC_FILTER,
                                                 METRIC_LABEL_REQUEST_COUNT, INTERVAL_SECONDS)
-        times_request_count = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) for time in times_request_count]
+        times_request_count = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) 
+                               for time in times_request_count]
         df_request_count = pd.DataFrame({"Time": times_request_count, "Request Count":
                                          usage_percent_request_count})
         st.line_chart(df_request_count.set_index("Time"), height=250)
@@ -345,7 +338,8 @@ elif page == "Dashboard":
     with tab4:
         usage_percent_request_latency, times_request_latency = get_metrics(
             REQUEST_LATENCY_METRIC_FILTER, MATRIC_LABEL_REQUEST_LATENCY, INTERVAL_SECONDS)
-        times_request_latency = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) for time in times_request_latency]
+        times_request_latency = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) 
+                                 for time in times_request_latency]
         df_request_latency = pd.DataFrame({"Time": times_request_latency, "Request Latency (ms)":
                                            usage_percent_request_latency})
         st.line_chart(df_request_latency.set_index("Time"), height=250)
