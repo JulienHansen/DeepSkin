@@ -1,9 +1,9 @@
 """
-This module provides functions for loading a pre-trained base model and making 
+This module provides functions for loading a pre-trained base model and making
 predictions on images.
 
 Functions:
-- load_model(input_checkpoint_path, device=None): Load a pre-trained base model from 
+- load_model(input_checkpoint_path, device=None): Load a pre-trained base model from
   the specified checkpoint path.
 - predict(model, image, metadata): Make predictions using both image and metadata.
 """

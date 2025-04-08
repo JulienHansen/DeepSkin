@@ -55,7 +55,7 @@ def get_metrics(metric_filter: str, metric_label: str, input_interval_seconds: i
     Retrieve metrics from Google Cloud Monitoring for a specified time interval.
 
     This function queries Google Cloud Monitoring for metrics such as CPU usage, RAM usage,
-    request count, or request latency, and returns the metric values and their corresponding 
+    request count, or request latency, and returns the metric values and their corresponding
     timestamps.
 
     Args:

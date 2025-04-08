@@ -1,7 +1,7 @@
 # 🩺 DeepSkin - Frontend
 
 ## 📌 Description
-Deepskin is a streamlit application for analysing skin images to detect different classes of skin lesions such as : 
+Deepskin is a streamlit application for analysing skin images to detect different classes of skin lesions such as :
 
     - Actinic Keratoses / Bowen's Disease (akiec)
     - Basal Cell Carcinoma (bcc)
@@ -24,7 +24,7 @@ The application also includes a dashboard 📊 for viewing performance metrics (
 ```
 
 ## :wrench: Installation
-### ✅ Prerequisites 
+### ✅ Prerequisites
 - 🐍 Python
 - 🐳 Docker
 - ☁️ Cloud account with API Monitoring enabled
@@ -41,12 +41,12 @@ It should be noted that if you are running locally there is no need to specify t
 streamlit run streamlit/main.py
 ```
 ### With Docker
-Building the image: 
+Building the image:
 ```
 docker build -t deepskin-front -f Dockerfile .
 ```
 
-Launch the container: 
+Launch the container:
 ```
 docker run -p 8501:8501 deepskin-front
 ```
@@ -60,9 +60,8 @@ Access the interface via: http://localhost:8501
 
 ### 📊 Dashboard page
 - 🕒 Selecting a time interval for displaying metrics
-- 📡 View Cloud Run metrics: 
+- 📡 View Cloud Run metrics:
     - 🚀 CPU usage
     - 🖥️ RAM usage
-    - 🔄 Number of requests 
+    - 🔄 Number of requests
     - ⏳ Request latency
- 

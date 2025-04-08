@@ -25,7 +25,7 @@ class HAM10000ImageDataset(Dataset):
     """
     Custom dataset for the HAM10000 dataset.
 
-    This dataset manages images and associated metadata (age, sex, location) 
+    This dataset manages images and associated metadata (age, sex, location)
     for skin disease classification tasks.
 
     Args:
@@ -177,12 +177,12 @@ def get_mean_std(input_dataset, batch_size):
 def unnormalize(img, input_mean, input_std):
     """
     Unnormalize a tensor image and convert it to a NumPy array for visualization.
-    
+
     Args:
         img (torch.Tensor): Normalized image tensor.
         mean (list or np.array): Mean used for normalization.
         std (list or np.array): Standard deviation used for normalization.
-        
+
     Returns:
         np.array: Unnormalized image as a NumPy array.
     """

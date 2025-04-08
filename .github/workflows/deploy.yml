@@ -1,17 +1,17 @@
-name: Deploy on Google Run 
+name: Deploy on Google Run
 
 on:
   pull_request:
     branches:
       - develop
       - main
-  push: 
+  push:
     branches:
       - develop
       - main
 
 
-jobs: 
+jobs:
   pylint:
     uses: ./.github/workflows/pylint.yml
 
@@ -22,7 +22,7 @@ jobs:
       BACKEND_URL: ${{ steps.deploy-backend.outputs.BACKEND_URL }}
 
     env:
-      PROJECT_ID: deepskin-451908  
+      PROJECT_ID: deepskin-451908
       REGION: europe-west1
       GC_CREDENTIALS: ${{ secrets.GC_CLEM }}
 
@@ -56,7 +56,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build and push Docker image backend
-        run: | 
+        run: |
           docker build \
             -f deployment/Dockerfile \
             --platform linux/amd64 \
@@ -92,7 +92,7 @@ jobs:
     needs: deploy-backend
 
     env:
-      PROJECT_ID: deepskin-451908  
+      PROJECT_ID: deepskin-451908
       REGION: europe-west1
 
     steps:
@@ -119,8 +119,8 @@ jobs:
             --region $REGION \
             --allow-unauthenticated \
             --set-env-vars BACKEND_URL=${{ needs.deploy-backend.outputs.BACKEND_URL }} \
-            --port 8501 
-  
+            --port 8501
+
   pytest:
     needs:
       - deploy-frontend

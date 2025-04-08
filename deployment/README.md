@@ -96,4 +96,3 @@ python main.py
 - Uploaded images are temporarily saved in the static/ directory for debugging.
 
 - Logging is enabled to help diagnose issues with image uploads.
-

@@ -16,7 +16,7 @@ We propose an application for automatically identifying nature and potential ris
 1. Provide the user with a interactive and easy to use interface to use our model.
 2. Classify the nature of the lesion, and give a probability score on the prediction.
 
-## Solution 
+## Solution
 
 - `core features`: Users upload images and the model predict the specific nature of the problem
 
@@ -25,7 +25,7 @@ We propose an application for automatically identifying nature and potential ris
 ## Feasibility
 
 - `data`: We use this [dataset](https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000)
-- `team`: We are all familiar with Deep learning notion 
+- `team`: We are all familiar with Deep learning notion
 - `infrastructure`:
     - `cloud`: We will use Google Cloud to deploy our model
 
@@ -67,10 +67,8 @@ CNN-based Deep learning model
 ## Feedback
 
 - User Reports: collect feedback on incorrect predictions made
-- Continuous Learning: Update the model with new labeled data 
+- Continuous Learning: Update the model with new labeled data
 
 ## Project
 
 Our whole project statement is available here [Project Statement]()
-
-

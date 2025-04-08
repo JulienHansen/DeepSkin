@@ -9,7 +9,7 @@ Key components:
 - Configuration for the Vertex AI training job, including container image, project ID,
     and bucket URI.
 - Packaging and uploading the Python training code to Google Cloud Storage (GCS).
-- Submitting the training job with specified arguments, such as learning rate, batch size, 
+- Submitting the training job with specified arguments, such as learning rate, batch size,
     and epochs.
 
 Usage:

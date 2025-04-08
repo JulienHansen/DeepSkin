@@ -48,8 +48,8 @@ We are using the **HAM10000** dataset from Kaggle: [HAM10000 Dataset](https://ww
 ### Infrastructure
 
 - **Cloud Deployment**: The model will be hosted on **Google Cloud** to ensure accessibility and scalability.
-- **Backend**: 
-- **Frontend**: 
+- **Backend**:
+- **Frontend**:
 
 <!-- ## :triangular_ruler: Modeling
 
@@ -76,7 +76,7 @@ Inference will be performed in real-time using the deployed model on **Google Cl
 
 ## :bricks: Building Blocks
 
-<!-- 
+<!--
 | Not started | ❌    |
 | In Progress | ⏳  |
 | Done | ✅  |

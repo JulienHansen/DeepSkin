@@ -59,7 +59,7 @@ def predict_endpoint():
     """
     Endpoint to make a prediction from an image and metadata.
 
-    This function receives a POST request containing an image and metadata 
+    This function receives a POST request containing an image and metadata
     (age, gender, location). It performs the following steps:
     - Checks the presence and format of the image.
     - Validates the image to ensure it is correct.
