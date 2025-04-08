@@ -44,6 +44,7 @@ test/
 archive/
 HAM10000/
 data/
+static/
 
 # MacOS special files:
 .DS_Store
@@ -52,3 +53,4 @@ data/
 credentials.json
 
 final_model.pt
+
