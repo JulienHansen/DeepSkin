@@ -181,7 +181,7 @@ if page == "Prediction":
 
     # API URL
     API_URL = f"{BACKEND_URL}/predict"
-
+    # API_URL = "http://localhost:5100/predict"
     col1, col2 = st.columns([1, 2])
 
     with col1:

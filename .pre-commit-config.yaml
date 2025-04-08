@@ -1,10 +1,6 @@
 repos:
-  - repo: https://github.com/pycqa/pylint 
-    rev: pylint-2.6.0
+  - repo: https://github.com/PyCQA/pylint
+    rev: v2.17.0  # ou une version plus récente stable
     hooks:
       - id: pylint
-        name: pylint
-        entry: pylint --fail-under=8 
-        language: system
-        types: [python]
-        require_serial: true
+        args: [--fail-under=8]
