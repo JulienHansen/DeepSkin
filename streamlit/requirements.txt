@@ -1,0 +1,7 @@
+streamlit
+requests
+google-cloud-monitoring 
+pandas
+datetime
+python-dotenv
+pytz

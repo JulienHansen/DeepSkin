@@ -43,8 +43,14 @@ test/
 # Dataset
 archive/
 HAM10000/
+data/
+static/
 
 # MacOS special files:
 .DS_Store
 
+# Secrets
+credentials.json
+
+final_model.pt
 

@@ -1,0 +1,33 @@
+name: Pytest unit tests
+
+on:
+  workflow_call:
+    inputs:
+      BACKEND_URL:
+        required: true
+        type: string
+
+jobs: 
+  pytest:
+    runs-on: ubuntu-latest
+    env:
+      BACKEND_URL: ${{ inputs.BACKEND_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r tests/requirements.txt
+
+      - name: Run Pytest
+        env:
+          BACKEND_URL: ${{ inputs.BACKEND_URL }}
+        run: |
+          pytest tests/
