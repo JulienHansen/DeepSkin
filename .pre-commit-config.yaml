@@ -1,5 +1,6 @@
 repos:
-  - repo: local
+  - repo: https://github.com/pycqa/pylint
+    rev: pylint-2.6.0
     hooks:
       - id: pylint
         name: pylint
@@ -7,14 +8,3 @@ repos:
         language: system
         types: [python]
         require_serial: true
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
-    rev: v0.11.4
-    hooks:
-      # Run the linter.
-      - id: ruff
-        types_or: [ python, pyi ]
-      # Run the formatter.
-      - id: ruff-format
-        types_or: [ python, pyi ]
