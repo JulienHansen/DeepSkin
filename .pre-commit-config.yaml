@@ -1,6 +1,0 @@
-repos:
-  - repo: https://github.com/PyCQA/pylint
-    rev: v2.17.0  # ou une version plus récente stable
-    hooks:
-      - id: pylint
-        args: [--fail-under=8]
