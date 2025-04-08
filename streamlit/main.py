@@ -181,7 +181,7 @@ if page == "Prediction":
 
     # API URL
     API_URL = f"{BACKEND_URL}/predict"
-    
+
     col1, col2 = st.columns([1, 2])
 
     with col1:
@@ -198,7 +198,7 @@ if page == "Prediction":
 
         col3, col4 = st.columns([1, 2])
 
-        with col3: 
+        with col3:
             button_analyze = st.button("Analyze the image")
         with col4:
             if uploaded_file is not None:
@@ -213,7 +213,8 @@ if page == "Prediction":
                     data = {"age": age, "sex": sex, "localization": localization}
                     headers = {"Accept": "application/json"}
 
-                    response = requests.post(API_URL, files=files, data=data, headers=headers, timeout=10)
+                    response = requests.post(API_URL, files=files, data=data, headers=headers,
+                                              timeout=10)
 
                     if response.status_code == 200:
                         result = response.json()
@@ -310,7 +311,7 @@ elif page == "Dashboard":
     with tab1:
         usage_percent_cpu, times_cpu = get_metrics(CPU_METRIC_FILTER, MATRIC_LABEL_CPU,
                                                    INTERVAL_SECONDS)
-        times_cpu = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) 
+        times_cpu = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz)
                      for time in times_cpu]
         df_cpu = pd.DataFrame({"Time": times_cpu, "CPU Usage (%)": usage_percent_cpu})
         st.line_chart(df_cpu.set_index("Time"), height=250)
@@ -319,7 +320,7 @@ elif page == "Dashboard":
     with tab2:
         usage_percent_ram, times_ram = get_metrics(RAM_METRIC_FILTER, MATRIC_LABEL_RAM,
                                                    INTERVAL_SECONDS)
-        times_ram = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) 
+        times_ram = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz)
                      for time in times_ram]
         df_ram = pd.DataFrame({"Time": times_ram, "RAM Usage (%)": usage_percent_ram})
         st.line_chart(df_ram.set_index("Time"), height=250)
@@ -328,7 +329,7 @@ elif page == "Dashboard":
     with tab3:
         usage_percent_request_count, times_request_count = get_metrics(REQUEST_COUNT_METRIC_FILTER,
                                                 METRIC_LABEL_REQUEST_COUNT, INTERVAL_SECONDS)
-        times_request_count = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) 
+        times_request_count = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz)
                                for time in times_request_count]
         df_request_count = pd.DataFrame({"Time": times_request_count, "Request Count":
                                          usage_percent_request_count})
@@ -338,7 +339,7 @@ elif page == "Dashboard":
     with tab4:
         usage_percent_request_latency, times_request_latency = get_metrics(
             REQUEST_LATENCY_METRIC_FILTER, MATRIC_LABEL_REQUEST_LATENCY, INTERVAL_SECONDS)
-        times_request_latency = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz) 
+        times_request_latency = [datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz)
                                  for time in times_request_latency]
         df_request_latency = pd.DataFrame({"Time": times_request_latency, "Request Latency (ms)":
                                            usage_percent_request_latency})

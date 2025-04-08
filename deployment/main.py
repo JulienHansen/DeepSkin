@@ -9,7 +9,7 @@ Usage:
 """
 import logging
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify
 from google.cloud import storage
 from PIL import Image
 from models.predict import load_model, predict
