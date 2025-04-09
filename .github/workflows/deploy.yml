@@ -10,15 +10,13 @@ on:
       - develop
       - main
 
-
 jobs:
   lint:
     uses: ./.github/workflows/ruff.yml
 
-
   deploy-backend:
     runs-on: ubuntu-latest
-    needs: pylint
+    needs: lint
     outputs:
       BACKEND_URL: ${{ steps.deploy-backend.outputs.BACKEND_URL }}
 
@@ -86,7 +84,6 @@ jobs:
           BACKEND_URL=$(python -c "import json; print(json.load(open('backend_output.json'))['status']['url'])")
           echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_OUTPUT
           echo "Backend URL: $BACKEND_URL"
-
 
   deploy-frontend:
     runs-on: ubuntu-latest
