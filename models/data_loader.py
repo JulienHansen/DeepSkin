@@ -41,27 +41,30 @@ class HAM10000ImageDataset(Dataset):
         class_to_idx (dict): Dictionary mapping class names to their indices.
         len_data (int): Total number of samples in the dataset.
     """
-    def __init__(self, csv_file, images_path_1, images_path_2, transform=None, max_samples=None):
+
+    def __init__(
+        self, csv_file, images_path_1, images_path_2, transform=None, max_samples=None
+    ):
         self.transform = transform if transform is not None else transforms.ToTensor()
 
         # Load metadata CSV
         self.data = pd.read_csv(csv_file)
 
         dx_mapping = {
-            'akiec': 'actinic keratoses',
-            'bcc': 'basal cell carcinoma',
-            'bkl': 'benign keratosis-like lesions',
-            'df': 'dermatofibroma',
-            'mel': 'melanoma',
-            'nv': 'melanocytic nevi',
-            'vasc': 'vascular lesions'
+            "akiec": "actinic keratoses",
+            "bcc": "basal cell carcinoma",
+            "bkl": "benign keratosis-like lesions",
+            "df": "dermatofibroma",
+            "mel": "melanoma",
+            "nv": "melanocytic nevi",
+            "vasc": "vascular lesions",
         }
-        self.data['dx'] = self.data['dx'].map(dx_mapping)
+        self.data["dx"] = self.data["dx"].map(dx_mapping)
 
-        self.data['image_path'] = self.data['image_id'].apply(
-            lambda x: os.path.join(images_path_1, x + '.jpg')
-            if os.path.exists(os.path.join(images_path_1, x + '.jpg'))
-            else os.path.join(images_path_2, x + '.jpg')
+        self.data["image_path"] = self.data["image_id"].apply(
+            lambda x: os.path.join(images_path_1, x + ".jpg")
+            if os.path.exists(os.path.join(images_path_1, x + ".jpg"))
+            else os.path.join(images_path_2, x + ".jpg")
         )
 
         if max_samples:
@@ -69,27 +72,31 @@ class HAM10000ImageDataset(Dataset):
 
         self.len_data = len(self.data)
 
-        self.class_names = sorted(self.data['dx'].unique())
+        self.class_names = sorted(self.data["dx"].unique())
         self.class_to_idx = {label: i for i, label in enumerate(self.class_names)}
 
         # Preprocess metadata (age, sex, localization)
-        self.data.loc[:, 'age'] = self.data['age'].fillna(self.data['age'].median()) / 100.0
+        self.data.loc[:, "age"] = (
+            self.data["age"].fillna(self.data["age"].median()) / 100.0
+        )
 
         # Clean and process the 'sex' column.
         def map_sex(sex_value):
             sex_value = str(sex_value).lower().strip() if pd.notnull(sex_value) else ""
-            if sex_value in ['male', 'm']:
+            if sex_value in ["male", "m"]:
                 return 0.0
-            if sex_value in ['female', 'f']:
+            if sex_value in ["female", "f"]:
                 return 1.0
 
             # Map unknown or unexpected values to 0.5
             return 0.5
 
-        self.data.loc[:, 'sex'] = self.data['sex'].apply(map_sex)
-        self.data.loc[:, 'localization'] = self.data['localization'].fillna('unknown')
-        self.data.loc[:, 'localization'] = self.data['localization'].astype('category').cat.codes
-        #print(self.data[['age', 'sex', 'localization']].isnull().sum())
+        self.data.loc[:, "sex"] = self.data["sex"].apply(map_sex)
+        self.data.loc[:, "localization"] = self.data["localization"].fillna("unknown")
+        self.data.loc[:, "localization"] = (
+            self.data["localization"].astype("category").cat.codes
+        )
+        # print(self.data[['age', 'sex', 'localization']].isnull().sum())
 
     def __len__(self):
         return self.len_data
@@ -114,15 +121,17 @@ class HAM10000ImageDataset(Dataset):
 
     def __getitem__(self, idx):
         row = self.data.iloc[idx]
-        image_path = row['image_path']
+        image_path = row["image_path"]
 
-        image = Image.open(image_path).convert('RGB')
+        image = Image.open(image_path).convert("RGB")
         if self.transform:
             image = self.transform(image)
 
-        label = torch.tensor(self.class_to_idx[row['dx']], dtype=torch.long)
+        label = torch.tensor(self.class_to_idx[row["dx"]], dtype=torch.long)
         # Get metadata as a tensor: [age, sex, localization]
-        metadata = torch.tensor([row['age'], row['sex'], row['localization']], dtype=torch.float32)
+        metadata = torch.tensor(
+            [row["age"], row["sex"], row["localization"]], dtype=torch.float32
+        )
 
         return image, metadata, label  # Now returns three values
 
@@ -147,6 +156,7 @@ def get_dataloader(input_dataset, batch_size, train_split=0.8):
     test_data_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     return train_data_loader, test_data_loader
+
 
 def get_mean_std(input_dataset, batch_size):
     """
@@ -174,6 +184,7 @@ def get_mean_std(input_dataset, batch_size):
     channel_std /= nb_samples
     return channel_mean, channel_std
 
+
 def unnormalize(img, input_mean, input_std):
     """
     Unnormalize a tensor image and convert it to a NumPy array for visualization.
@@ -191,20 +202,22 @@ def unnormalize(img, input_mean, input_std):
     img = np.clip(img, 0, 1)
     return img
 
-if __name__ == '__main__':
-    CSV_FILE = '../archive/HAM10000_metadata.csv'
-    IMAGES_PATH_1 = '../archive/HAM10000_images_part_1/'
-    IMAGES_PATH_2 = '../archive/HAM10000_images_part_2/'
+
+if __name__ == "__main__":
+    CSV_FILE = "../archive/HAM10000_metadata.csv"
+    IMAGES_PATH_1 = "../archive/HAM10000_images_part_1/"
+    IMAGES_PATH_2 = "../archive/HAM10000_images_part_2/"
     BATCH_SIZE = 32
     MAX_SAMPLES = 1000
 
     # Define the image transformation pipeline.
-    transform_pipeline = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                             std=[0.229, 0.224, 0.225])
-    ])
+    transform_pipeline = transforms.Compose(
+        [
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
 
     # Create the dataset.
     dataset = HAM10000ImageDataset(
@@ -212,7 +225,7 @@ if __name__ == '__main__':
         images_path_1=IMAGES_PATH_1,
         images_path_2=IMAGES_PATH_2,
         transform=transform_pipeline,
-        max_samples=MAX_SAMPLES
+        max_samples=MAX_SAMPLES,
     )
 
     # Create data loaders.
@@ -222,8 +235,8 @@ if __name__ == '__main__':
     print("Test samples:", len(test_loader) * BATCH_SIZE)
 
     mean, std = get_mean_std(dataset, batch_size=256)
-    print('Mean:', mean)
-    print('Std:', std)
+    print("Mean:", mean)
+    print("Std:", std)
 
     img_mean = np.array([0.485, 0.456, 0.406])
     img_std = np.array([0.229, 0.224, 0.225])

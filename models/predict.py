@@ -15,15 +15,23 @@ import torch
 from PIL import Image, ImageFile, UnidentifiedImageError
 from torchvision import transforms
 import pandas as pd
-from .model import MultiModalLesionClassifier  # Ensure this import matches your project structure
+from .model import (
+    MultiModalLesionClassifier,
+)  # Ensure this import matches your project structure
 
 # Mapping from index to class names for HAM10000
 INDEX_TO_CLASS = {
-    0: 'actinic keratoses', 1: 'basal cell carcinoma', 2: 'benign keratosis-like lesions',
-    3: 'dermatofibroma', 4: 'melanoma', 5: 'melanocytic nevi', 6: 'vascular lesions'
+    0: "actinic keratoses",
+    1: "basal cell carcinoma",
+    2: "benign keratosis-like lesions",
+    3: "dermatofibroma",
+    4: "melanoma",
+    5: "melanocytic nevi",
+    6: "vascular lesions",
 }
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 
 def load_model(input_checkpoint_path, device=None):
     """
@@ -37,14 +45,16 @@ def load_model(input_checkpoint_path, device=None):
         torch.nn.Module: Loaded pre-trained base model.
     """
     if device is None:
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Initialize the base model
     loaded_model = MultiModalLesionClassifier(num_meta_features=3, num_classes=7)
     loaded_model.to(device)
 
     # Load checkpoint
-    checkpoint = torch.load(input_checkpoint_path, map_location=device, weights_only=False)
+    checkpoint = torch.load(
+        input_checkpoint_path, map_location=device, weights_only=False
+    )
 
     # Filter out mismatched keys
     model_dict = loaded_model.state_dict()
@@ -52,8 +62,11 @@ def load_model(input_checkpoint_path, device=None):
         raise TypeError(
             f"Expected 'model_dict' to be a dictionary, but got type: {type(model_dict)}"
         )
-    filtered_dict = {k: v for k, v in checkpoint['model_state_dict'].items()
-                     if k in model_dict and v.size() == model_dict[k].size()}
+    filtered_dict = {
+        k: v
+        for k, v in checkpoint["model_state_dict"].items()
+        if k in model_dict and v.size() == model_dict[k].size()
+    }
 
     # Update the existing model's state_dict
     model_dict.update(filtered_dict)
@@ -63,6 +76,7 @@ def load_model(input_checkpoint_path, device=None):
 
     loaded_model.eval()
     return loaded_model
+
 
 def preprocess_image(image):
     """
@@ -78,39 +92,46 @@ def preprocess_image(image):
     if isinstance(image, str):
         if os.path.exists(image):
             # It's a file path; open it directly.
-            image = Image.open(image).convert('RGB')
+            image = Image.open(image).convert("RGB")
         else:
             # Otherwise, assume it's a base64 encoded string.
             try:
                 decoded = base64.b64decode(image)
-                image = Image.open(io.BytesIO(decoded)).convert('RGB')
+                image = Image.open(io.BytesIO(decoded)).convert("RGB")
             except Exception as error:
-                raise ValueError("The string provided is neither a valid file"
-                                "path nor a proper base64 encoded image.") from error
+                raise ValueError(
+                    "The string provided is neither a valid file"
+                    "path nor a proper base64 encoded image."
+                ) from error
     elif isinstance(image, bytes):
         # Try opening the bytes directly.
         try:
-            image = Image.open(io.BytesIO(image)).convert('RGB')
+            image = Image.open(io.BytesIO(image)).convert("RGB")
         except UnidentifiedImageError:
             # If that fails, assume the bytes are actually base64-encoded.
             try:
                 decoded = base64.b64decode(image)
-                image = Image.open(io.BytesIO(decoded)).convert('RGB')
+                image = Image.open(io.BytesIO(decoded)).convert("RGB")
             except Exception as error:
-                raise ValueError("The bytes provided are neither a valid raw image"
-                                "nor a proper base64 encoded image.") from error
+                raise ValueError(
+                    "The bytes provided are neither a valid raw image"
+                    "nor a proper base64 encoded image."
+                ) from error
     else:
         raise TypeError("Unsupported type for image. Must be bytes or str.")
 
     # Define the transform for the image.
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
+    transform = transforms.Compose(
+        [
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
 
     image = transform(image).unsqueeze(0)
     return image
+
 
 def preprocess_metadata(age, sex, localization):
     """
@@ -128,7 +149,7 @@ def preprocess_metadata(age, sex, localization):
     age = float(age)  # Convert to float if it isn't already
 
     age = age / 100.0  # Normalize age
-    sex = 0.0 if sex.lower() == 'male' else 1.0  # Encode sex
+    sex = 0.0 if sex.lower() == "male" else 1.0  # Encode sex
     localization_code = pd.Categorical([localization]).codes[0]  # Encode localization
 
     metadata = torch.tensor([[age, sex, localization_code]], dtype=torch.float32)
@@ -160,8 +181,11 @@ def predict(input_model, image, metadata, device=None):
 
     return {INDEX_TO_CLASS[i]: output[0][i].item() for i in range(len(output[0]))}
 
-if __name__ == '__main__':
-    CHECKPOINT_PATH = 'models/checkpoints/final_model.pt'  # Path to your base model checkpoint
+
+if __name__ == "__main__":
+    CHECKPOINT_PATH = (
+        "models/checkpoints/final_model.pt"  # Path to your base model checkpoint
+    )
     model = load_model(CHECKPOINT_PATH)
 
     with open("models/ISIC_0024306.jpg", "rb") as f:

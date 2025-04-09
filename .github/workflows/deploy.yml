@@ -12,8 +12,9 @@ on:
 
 
 jobs:
-  pylint:
-    uses: ./.github/workflows/pylint.yml
+  lint:
+    uses: ./.github/workflows/ruff.yml
+
 
   deploy-backend:
     runs-on: ubuntu-latest

@@ -24,6 +24,7 @@ import torch
 from torch import nn
 from torchvision import models
 
+
 class MultiModalLesionClassifier(nn.Module):
     """
     Multi-Modal Lesion Classifier
@@ -36,6 +37,7 @@ class MultiModalLesionClassifier(nn.Module):
         num_meta_features (int): Number of features in the metadata.
         num_classes (int): Number of output classes.
     """
+
     def __init__(self, num_meta_features, num_classes):
         super(MultiModalLesionClassifier, self).__init__()
 
@@ -53,7 +55,7 @@ class MultiModalLesionClassifier(nn.Module):
             nn.Linear(num_meta_features, meta_hidden),
             nn.ReLU(),
             nn.Linear(meta_hidden, meta_hidden),
-            nn.ReLU()
+            nn.ReLU(),
         )
 
         # Fusion and final classification
@@ -98,9 +100,9 @@ class MultiModalLesionClassifier(nn.Module):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     NUM_META_FEATURES = 3
     NUM_CLASSES = 7
 
     base_model = MultiModalLesionClassifier(NUM_META_FEATURES, NUM_CLASSES)
-    print('Base model parameters:', base_model.n_params)
+    print("Base model parameters:", base_model.n_params)

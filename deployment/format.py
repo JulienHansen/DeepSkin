@@ -9,14 +9,14 @@ Usage :
 import json
 import sys
 
-with open(sys.argv[1], 'r', encoding='utf-8') as f:
+with open(sys.argv[1], "r", encoding="utf-8") as f:
     content = f.read()
 
-cleaned_content = content.replace('\n', '').strip()
+cleaned_content = content.replace("\n", "").strip()
 
 try:
     data = json.loads(cleaned_content)
-    with open(sys.argv[1], 'w', encoding='utf-8') as f:
+    with open(sys.argv[1], "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     print("Fichier JSON reformaté avec succès.")
 except json.JSONDecodeError as e:
