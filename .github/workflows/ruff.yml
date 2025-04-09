@@ -24,4 +24,4 @@ jobs:
         run: pip install ruff
 
       - name: Run Ruff (without fix)
-        run: ruff . --exit-zero --output-format=github
+        run: ruff check . --exit-zero --output-format=github
