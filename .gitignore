@@ -51,5 +51,6 @@ static/
 
 # Secrets
 credentials.json
+*credentials.json
 
 final_model.pt
