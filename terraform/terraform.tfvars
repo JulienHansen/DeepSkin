@@ -1,0 +1,5 @@
+project_id          = "your-gcp-project-id"
+region              = "europe-west1"
+dataset_bucket_name = "your-dataset-bucket"
+model_bucket_name   = "your-model-bucket"
+code_bucket_name    = "your-code-bucket"
