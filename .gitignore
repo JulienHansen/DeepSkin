@@ -2,7 +2,7 @@
 
 
 
-# Byte-compiled 
+# Byte-compiled
 
 __pycache__/
 *.py[cod]
@@ -44,11 +44,13 @@ test/
 archive/
 HAM10000/
 data/
+static/
 
 # MacOS special files:
 .DS_Store
 
 # Secrets
 credentials.json
+*credentials.json
 
 final_model.pt

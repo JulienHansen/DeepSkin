@@ -1,6 +1,7 @@
 streamlit
 requests
-google-cloud-monitoring 
+google-cloud-monitoring
 pandas
 datetime
 python-dotenv
+pytz

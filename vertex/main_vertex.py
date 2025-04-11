@@ -9,7 +9,7 @@ Key components:
 - Configuration for the Vertex AI training job, including container image, project ID,
     and bucket URI.
 - Packaging and uploading the Python training code to Google Cloud Storage (GCS).
-- Submitting the training job with specified arguments, such as learning rate, batch size, 
+- Submitting the training job with specified arguments, such as learning rate, batch size,
     and epochs.
 
 Usage:
@@ -28,8 +28,9 @@ from google.cloud import aiplatform
 
 
 # --- CONFIG ---
-PRE_BUILT_TRAINING_CONTAINER_IMAGE_URI = "europe-docker.pkg.dev" \
-"/vertex-ai/training/pytorch-gpu.1-13.py310:latest"
+PRE_BUILT_TRAINING_CONTAINER_IMAGE_URI = (
+    "europe-docker.pkg.dev/vertex-ai/training/pytorch-gpu.1-13.py310:latest"
+)
 
 APP_NAME = "deep_skin"
 PROJECT_ID = "deepskin-451908"
@@ -38,9 +39,12 @@ LOCATION = "europe-west1"
 
 
 PYTHON_PACKAGE_APPLICATION_DIR = ".."
-SOURCE_PACKAGE_FILE_NAME = f"{PYTHON_PACKAGE_APPLICATION_DIR}/dist/deepskin_vertex-0.1.tar.gz"
-PYTHON_PACKAGE_GCS_URI = f"{BUCKET_URI}/pytorch-on-gcp//train/python_package/" \
-"deepskin_vertex-0.1.tar.gz"
+SOURCE_PACKAGE_FILE_NAME = (
+    f"{PYTHON_PACKAGE_APPLICATION_DIR}/dist/deepskin_vertex-0.1.tar.gz"
+)
+PYTHON_PACKAGE_GCS_URI = (
+    f"{BUCKET_URI}/pytorch-on-gcp//train/python_package/deepskin_vertex-0.1.tar.gz"
+)
 PYTHON_MODULE_NAME = "models.train"
 
 # Initialize Vertex SDK
@@ -59,21 +63,31 @@ job = aiplatform.CustomPythonPackageTrainingJob(
     python_package_gcs_uri=PYTHON_PACKAGE_GCS_URI,
     python_module_name=PYTHON_MODULE_NAME,
     container_uri=PRE_BUILT_TRAINING_CONTAINER_IMAGE_URI,
-    location=LOCATION
+    location=LOCATION,
 )
 
 # Define training arguments
 training_args = [
-    "--data_path", "models/data",
-    "--epochs", "10",
-    "--batch_size", "64",
-    "--lr", "0.0003",
-    "--train_prop", "0.8",
-    "--device", "cuda",
-    "--img_size", "224",
-    "--max_samples", "1000",
-    "--optimizer", "AdamW",
-    "--save_path", "gs://trained_deepskin_model/trained_models/",
+    "--data_path",
+    "models/data",
+    "--epochs",
+    "10",
+    "--batch_size",
+    "64",
+    "--lr",
+    "0.0003",
+    "--train_prop",
+    "0.8",
+    "--device",
+    "cuda",
+    "--img_size",
+    "224",
+    "--max_samples",
+    "1000",
+    "--optimizer",
+    "AdamW",
+    "--save_path",
+    "gs://trained_deepskin_model/trained_models/",
     "--on_cloud",
 ]
 
@@ -85,5 +99,5 @@ job.run(
     accelerator_count=1,
     args=training_args,
     sync=True,
-    service_account="808565425437-compute@developer.gserviceaccount.com"
+    service_account="808565425437-compute@developer.gserviceaccount.com",
 )

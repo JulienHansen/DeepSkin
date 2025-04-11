@@ -1,17 +1,17 @@
 """
-This module defines the MultiModalLesionClassifier, a deep learning 
+This module defines the MultiModalLesionClassifier, a deep learning
 model for skin lesion classification.
 
 The model combines two branches:
 - An image branch using a pretrained ResNet18 for processing image data.
-- A metadata branch using a simple MLP for processing patient metadata 
+- A metadata branch using a simple MLP for processing patient metadata
   (e.g., age, sex, localization).
 
-The features from both branches are fused and passed through a fully connected 
+The features from both branches are fused and passed through a fully connected
 classifier to predict the lesion class.
 
 Usage:
-    Import this module and instantiate the `MultiModalLesionClassifier` 
+    Import this module and instantiate the `MultiModalLesionClassifier`
     with the required number of metadata features
     and output classes. Use the `forward` method to perform inference.
 
@@ -23,6 +23,7 @@ Example:
 import torch
 from torch import nn
 from torchvision import models
+
 
 class MultiModalLesionClassifier(nn.Module):
     """
@@ -36,6 +37,7 @@ class MultiModalLesionClassifier(nn.Module):
         num_meta_features (int): Number of features in the metadata.
         num_classes (int): Number of output classes.
     """
+
     def __init__(self, num_meta_features, num_classes):
         super(MultiModalLesionClassifier, self).__init__()
 
@@ -53,7 +55,7 @@ class MultiModalLesionClassifier(nn.Module):
             nn.Linear(num_meta_features, meta_hidden),
             nn.ReLU(),
             nn.Linear(meta_hidden, meta_hidden),
-            nn.ReLU()
+            nn.ReLU(),
         )
 
         # Fusion and final classification
@@ -75,9 +77,9 @@ class MultiModalLesionClassifier(nn.Module):
         the final output.
 
         Args:
-            image (torch.Tensor): A tensor representing the input image batch, with shape 
+            image (torch.Tensor): A tensor representing the input image batch, with shape
             (batch_size, channels, height, width).
-            metadata (torch.Tensor): A tensor representing the metadata batch, with shape 
+            metadata (torch.Tensor): A tensor representing the metadata batch, with shape
             (batch_size, num_meta_features).
 
         Returns:
@@ -98,9 +100,9 @@ class MultiModalLesionClassifier(nn.Module):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     NUM_META_FEATURES = 3
     NUM_CLASSES = 7
 
     base_model = MultiModalLesionClassifier(NUM_META_FEATURES, NUM_CLASSES)
-    print('Base model parameters:', base_model.n_params)
+    print("Base model parameters:", base_model.n_params)

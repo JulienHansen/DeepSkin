@@ -24,7 +24,10 @@ import os
 from google.cloud import monitoring_v3
 import pandas as pd
 import requests
+import pytz
 import streamlit as st
+
+st.set_page_config(layout="wide")
 
 client = monitoring_v3.MetricServiceClient()
 PROJECT_NAME = "projects/deepskin-451908"
@@ -47,12 +50,13 @@ PAGES = {
     "Dashboard": "dashboard",
 }
 
+
 def get_metrics(metric_filter: str, metric_label: str, input_interval_seconds: int):
     """
     Retrieve metrics from Google Cloud Monitoring for a specified time interval.
 
     This function queries Google Cloud Monitoring for metrics such as CPU usage, RAM usage,
-    request count, or request latency, and returns the metric values and their corresponding 
+    request count, or request latency, and returns the metric values and their corresponding
     timestamps.
 
     Args:
@@ -67,7 +71,7 @@ def get_metrics(metric_filter: str, metric_label: str, input_interval_seconds: i
     """
     interval = monitoring_v3.TimeInterval(
         start_time={"seconds": int(time.time()) - input_interval_seconds},
-        end_time={"seconds": int(time.time())}
+        end_time={"seconds": int(time.time())},
     )
 
     request = monitoring_v3.ListTimeSeriesRequest(
@@ -106,47 +110,70 @@ def get_metrics(metric_filter: str, metric_label: str, input_interval_seconds: i
     return usage_percent, times
 
 
-page = st.sidebar.selectbox("Choisissez une page", options=list(PAGES.keys()))
+st.sidebar.image("./.github/pictures/logo-bg.png", use_container_width=True)
+page = st.sidebar.selectbox("Choose a page", options=list(PAGES.keys()))
+
 
 if page == "Prediction":
+    header = st.container()
+    header.title("Skin analysis with AI 🔬")
+    header.write("""<div class='fixed-header'/>""", unsafe_allow_html=True)
+
+    st.markdown(
+        """
+    <style>
+        div[data-testid="stVerticalBlock"] div:has(div.fixed-header) {
+            position: sticky;
+            top: 2.875rem;
+            background-color: white;
+            z-index: 999;
+            text-align: center
+        }
+        .fixed-header {
+            border-bottom: 1px solid black;
+        }
+    </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
     diagnosis_info = {
         "akiec": {
             "name": "Actinic Keratoses / Bowen's Disease",
             "description": "Precancerous skin lesions often caused by sun damage. "
-                            "Can develop into squamous cell carcinoma."
+            "Can develop into squamous cell carcinoma.",
         },
         "bcc": {
             "name": "Basal Cell Carcinoma",
             "description": "The most common type of skin cancer, usually "
-                            "localized and slow-growing."
+            "localized and slow-growing.",
         },
         "bkl": {
             "name": "Benign Keratosis-like Lesions",
             "description": "Non-cancerous growths like solar lentigines, "
-                            "seborrheic keratoses, and lichen-planus like keratoses."
+            "seborrheic keratoses, and lichen-planus like keratoses.",
         },
         "df": {
             "name": "Dermatofibroma",
-            "description": "Benign skin nodule, often firm and small, typically not harmful."
+            "description": "Benign skin nodule, often firm and small, typically not harmful.",
         },
         "mel": {
             "name": "Melanoma",
             "description": "A serious form of skin cancer that can spread quickly if not "
-                            "treated early."
+            "treated early.",
         },
         "nv": {
             "name": "Melanocytic Nevi",
-            "description": "Common moles made up of pigment-producing cells; generally harmless."
+            "description": "Common moles made up of pigment-producing cells; generally harmless.",
         },
         "vasc": {
             "name": "Vascular Lesions",
             "description": "Includes angiomas, angiokeratomas, pyogenic granulomas, "
-                            "and hemorrhage. Usually benign."
+            "and hemorrhage. Usually benign.",
         },
     }
 
-    with st.expander("Détails de tous les diagnostics possibles"):
+    with st.expander("Details of all possible diagnoses"):
         for key, value in diagnosis_info.items():
             st.write(f"### {value['name']}")
             st.write(value["description"])
@@ -154,70 +181,124 @@ if page == "Prediction":
 
     # API URL
     API_URL = f"{BACKEND_URL}/predict"
+    # API_URL = "http://localhost:5100/predict"
+    col1, col2 = st.columns([1, 2])
 
-    st.title("Analyse de la peau avec IA")
+    with col1:
+        age = st.number_input("Age", min_value=0, max_value=120)
+        sex = st.selectbox("Sexe", ["male", "female"])
+        localizations = [
+            "scalp",
+            "ear",
+            "face",
+            "back",
+            "trunk",
+            "chest",
+            "upper extremity",
+            "abdomen",
+            "unknown",
+            "lower extremity",
+            "genital",
+            "neck",
+            "hand",
+            "foot",
+            "acral",
+        ]
+        localization = st.selectbox("Localization", localizations)
 
-    age = st.number_input("Âge", min_value=0, max_value=120)
-    sex = st.selectbox("Sexe", ["male", "female"])
-    localizations = [
-        'scalp', 'ear', 'face', 'back', 'trunk', 'chest', 'upper extremity', 'abdomen',
-        'unknown', 'lower extremity', 'genital', 'neck', 'hand', 'foot', 'acral'
-    ]
-    localization = st.selectbox("Localisation", localizations)
+        uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
-    uploaded_file = st.file_uploader("Téléchargez une image", type=["jpg", "jpeg", "png"])
+        col3, col4 = st.columns([1, 2])
 
-    if st.button("Analyser l'image"):
-        if uploaded_file is not None:
-            files = {"image": (uploaded_file.name, uploaded_file, uploaded_file.type)}
-            data = {"age": age, "sex": sex, "localization": localization}
-            headers = {"Accept": "application/json"}
+        with col3:
+            button_analyze = st.button("Analyze the image")
+        with col4:
+            if uploaded_file is not None:
+                st.image(uploaded_file, caption="Uploaded image", width=150)
 
-            response = requests.post(API_URL, files=files, data=data, headers=headers, timeout=10)
+    with col2:
+        if button_analyze:
+            if uploaded_file is not None:
+                with st.spinner("🔄 Analyse en cours..."):
+                    files = {
+                        "image": (uploaded_file.name, uploaded_file, uploaded_file.type)
+                    }
+                    data = {"age": age, "sex": sex, "localization": localization}
+                    headers = {"Accept": "application/json"}
 
-            if response.status_code == 200:
-                result = response.json()
-                st.image(uploaded_file, caption="Image téléchargée", use_container_width=True)
-                st.write("### Résultat de l'analyse")
-                st.write(f"**Classe prédite :** {result['prediction']}")
+                    response = requests.post(
+                        API_URL, files=files, data=data, headers=headers, timeout=10
+                    )
 
-                #st.write("#### Détails des probabilités")
-                #st.json(result.get("probabilities", {}))
+                    if response.status_code == 200:
+                        result = response.json()
+                        # st.image(uploaded_file, caption="Uploaded image", width=150)
+                        st.write("### Analysis Result")
+                        st.write(f"**Predicted class :** {result['prediction']}")
 
-                probabilities = result.get("probabilities", {})
-                # Conversion en DataFrame
-                df = pd.DataFrame(list(probabilities.items()), columns=["Nom de la maladie",
-                                                                        "Probabilité"])
+                        # st.write("#### Détails des probabilités")
+                        # st.json(result.get("probabilities", {}))
 
-                # Affichage du titre
-                st.write("#### Détails des probabilités")
+                        probabilities = result.get("probabilities", {})
+                        # Conversion en DataFrame
+                        df = pd.DataFrame(
+                            list(probabilities.items()),
+                            columns=["Nom de la maladie", "Probabilité"],
+                        )
 
-                # Affichage du tableau avec les barres de progression
-                for index, row in df.iterrows():
-                    col1, col2, col3 = st.columns([2, 3, 1])
+                        # Affichage du titre
+                        st.write("#### Details of probabilities")
 
-                    with col1:
-                        st.write(row["Nom de la maladie"])
+                        # Affichage du tableau avec les barres de progression
+                        for index, row in df.iterrows():
+                            col1, col2, col3 = st.columns([2, 3, 1])
 
-                    with col2:
-                        st.progress(row["Probabilité"])  # Affiche une barre de progression
+                            with col1:
+                                st.write(row["Nom de la maladie"])
 
-                    with col3:
-                        # Affiche le pourcentage en chiffres
-                        st.write(f"{row['Probabilité']*100:.6f}%")
+                            with col2:
+                                st.progress(
+                                    row["Probabilité"]
+                                )  # Affiche une barre de progression
+
+                            with col3:
+                                # Affiche le pourcentage en chiffres
+                                st.write(f"{row['Probabilité'] * 100:.6f}%")
+                    else:
+                        st.error(
+                            f"Error: {response.json().get('error', 'Uknown error')}"
+                        )
             else:
-                st.error(f"Erreur: {response.json().get('error', 'Erreur inconnue')}")
-        else:
-            st.warning("Veuillez télécharger une image avant d'analyser.")
+                st.warning("Please upload an image before analyzing.")
 
 
 elif page == "Dashboard":
+    header = st.container()
+    header.title("Monitoring Cloud Run metrics 🖥️")
+    header.write("""<div class='fixed-header'/>""", unsafe_allow_html=True)
 
-    st.title("Monitoring des métriques Cloud Run")
+    st.markdown(
+        """
+    <style>
+        div[data-testid="stVerticalBlock"] div:has(div.fixed-header) {
+            position: sticky;
+            top: 2.875rem;
+            background-color: white;
+            z-index: 999;
+            text-align: center
+        }
+        .fixed-header {
+            border-bottom: 1px solid black;
+        }
+    </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # st.title("Monitoring Cloud Run metrics")
 
     interval_choice = st.selectbox(
-    "Choisir l'intervalle de temps",
-    ["24 heures", "1 heure", "5 minutes"]
+        "Choose the time interval", ["24 heures", "1 heure", "5 minutes"]
     )
 
     if interval_choice == "24 heures":
@@ -232,49 +313,80 @@ elif page == "Dashboard":
     METRIC_LABEL_REQUEST_COUNT = "Request Count"
     MATRIC_LABEL_REQUEST_LATENCY = "Request Latency"
 
-    CPU_METRIC_FILTER = 'metric.type="run.googleapis.com/container/cpu/utilizations" ' \
-                        'AND resource.type="cloud_run_revision"'
-    RAM_METRIC_FILTER = 'metric.type="run.googleapis.com/container/memory/utilizations" ' \
-                        'AND resource.type="cloud_run_revision"'
-    REQUEST_COUNT_METRIC_FILTER = 'metric.type="run.googleapis.com/request_count" ' \
-                                    'AND resource.type="cloud_run_revision"'
-    REQUEST_LATENCY_METRIC_FILTER = 'metric.type="run.googleapis.com/request_latencies" ' \
-                                    'AND resource.type="cloud_run_revision"'
+    CPU_METRIC_FILTER = (
+        'metric.type="run.googleapis.com/container/cpu/utilizations" '
+        'AND resource.type="cloud_run_revision"'
+    )
+    RAM_METRIC_FILTER = (
+        'metric.type="run.googleapis.com/container/memory/utilizations" '
+        'AND resource.type="cloud_run_revision"'
+    )
+    REQUEST_COUNT_METRIC_FILTER = (
+        'metric.type="run.googleapis.com/request_count" '
+        'AND resource.type="cloud_run_revision"'
+    )
+    REQUEST_LATENCY_METRIC_FILTER = (
+        'metric.type="run.googleapis.com/request_latencies" '
+        'AND resource.type="cloud_run_revision"'
+    )
 
     tab1, tab2, tab3, tab4 = st.tabs(["CPU", "RAM", "Request Count", "Request Latency"])
 
+    brussels_tz = pytz.timezone("Europe/Brussels")
+
     with tab1:
-        usage_percent_cpu, times_cpu = get_metrics(CPU_METRIC_FILTER, MATRIC_LABEL_CPU,
-                                                   INTERVAL_SECONDS)
-        times_cpu = [datetime.datetime.utcfromtimestamp(time.timestamp()) for time in times_cpu]
+        usage_percent_cpu, times_cpu = get_metrics(
+            CPU_METRIC_FILTER, MATRIC_LABEL_CPU, INTERVAL_SECONDS
+        )
+        times_cpu = [
+            datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz)
+            for time in times_cpu
+        ]
         df_cpu = pd.DataFrame({"Time": times_cpu, "CPU Usage (%)": usage_percent_cpu})
         st.line_chart(df_cpu.set_index("Time"), height=250)
         st.write(df_cpu)
 
     with tab2:
-        usage_percent_ram, times_ram = get_metrics(RAM_METRIC_FILTER, MATRIC_LABEL_RAM,
-                                                   INTERVAL_SECONDS)
-        times_ram = [datetime.datetime.utcfromtimestamp(time.timestamp()) for time in times_ram]
+        usage_percent_ram, times_ram = get_metrics(
+            RAM_METRIC_FILTER, MATRIC_LABEL_RAM, INTERVAL_SECONDS
+        )
+        times_ram = [
+            datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz)
+            for time in times_ram
+        ]
         df_ram = pd.DataFrame({"Time": times_ram, "RAM Usage (%)": usage_percent_ram})
         st.line_chart(df_ram.set_index("Time"), height=250)
         st.write(df_ram)
 
     with tab3:
-        usage_percent_request_count, times_request_count = get_metrics(REQUEST_COUNT_METRIC_FILTER,
-                                                METRIC_LABEL_REQUEST_COUNT, INTERVAL_SECONDS)
-        times_request_count = [datetime.datetime.utcfromtimestamp(time.timestamp())
-                               for time in times_request_count]
-        df_request_count = pd.DataFrame({"Time": times_request_count, "Request Count":
-                                         usage_percent_request_count})
+        usage_percent_request_count, times_request_count = get_metrics(
+            REQUEST_COUNT_METRIC_FILTER, METRIC_LABEL_REQUEST_COUNT, INTERVAL_SECONDS
+        )
+        times_request_count = [
+            datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz)
+            for time in times_request_count
+        ]
+        df_request_count = pd.DataFrame(
+            {"Time": times_request_count, "Request Count": usage_percent_request_count}
+        )
         st.line_chart(df_request_count.set_index("Time"), height=250)
         st.write(df_request_count)
 
     with tab4:
         usage_percent_request_latency, times_request_latency = get_metrics(
-            REQUEST_LATENCY_METRIC_FILTER, MATRIC_LABEL_REQUEST_LATENCY, INTERVAL_SECONDS)
-        times_request_latency = [datetime.datetime.utcfromtimestamp(time.timestamp())
-                                 for time in times_request_latency]
-        df_request_latency = pd.DataFrame({"Time": times_request_latency, "Request Latency (ms)":
-                                           usage_percent_request_latency})
+            REQUEST_LATENCY_METRIC_FILTER,
+            MATRIC_LABEL_REQUEST_LATENCY,
+            INTERVAL_SECONDS,
+        )
+        times_request_latency = [
+            datetime.datetime.fromtimestamp(time.timestamp(), brussels_tz)
+            for time in times_request_latency
+        ]
+        df_request_latency = pd.DataFrame(
+            {
+                "Time": times_request_latency,
+                "Request Latency (ms)": usage_percent_request_latency,
+            }
+        )
         st.line_chart(df_request_latency.set_index("Time"), height=250)
         st.write(df_request_latency)
