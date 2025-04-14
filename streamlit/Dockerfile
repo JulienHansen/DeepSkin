@@ -2,7 +2,11 @@ FROM python:latest
 
 WORKDIR /app
 
+# Copy the full streamlit directory including any subfolders like .github
 COPY streamlit/ /app/streamlit/
+
+# Explicitly copy the .github folder if it’s outside of the streamlit folder
+COPY .github/ /app/.github/
 
 EXPOSE 8501
 

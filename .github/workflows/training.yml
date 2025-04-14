@@ -24,7 +24,7 @@ jobs:
             echo "Training not requested."
           fi
           echo "::debug::Commit message check completed."
-  
+
   train_vertex_model:
     needs: check_commit
     if: needs.check_commit.outputs.match == 'true'
@@ -40,7 +40,7 @@ jobs:
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
-    
+
       - name: 'Use gcloud CLI'
         run: |
           gcloud info

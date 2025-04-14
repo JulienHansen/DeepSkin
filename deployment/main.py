@@ -7,9 +7,10 @@ It includes :
 Usage:
     Run this script to start the Flask server.
 """
+
 import logging
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify
 from google.cloud import storage
 from PIL import Image
 from models.predict import load_model, predict
@@ -25,6 +26,7 @@ LOCAL_MODEL_PATH = "final_model.pt"
 
 # Initialize Flask App
 app = Flask(__name__)
+
 
 def download_model_from_gcs(bucket_uri, model_blob_name, local_path):
     """
@@ -45,21 +47,23 @@ def download_model_from_gcs(bucket_uri, model_blob_name, local_path):
     blob.download_to_filename(local_path)
     print(f"Downloaded model from {bucket_uri}/{model_blob_name} to {local_path}")
 
+
 # Download the trained model and load it
 download_model_from_gcs(MODEL_BUCKET_URI, MODEL_BLOB_NAME, LOCAL_MODEL_PATH)
 model = load_model(LOCAL_MODEL_PATH)
 
 # Ensure the static directory exists
-static_dir = os.path.join(os.getcwd(), 'static')
+static_dir = os.path.join(os.getcwd(), "static")
 if not os.path.exists(static_dir):
     os.makedirs(static_dir)
+
 
 @app.route("/predict", methods=["POST"])
 def predict_endpoint():
     """
     Endpoint to make a prediction from an image and metadata.
 
-    This function receives a POST request containing an image and metadata 
+    This function receives a POST request containing an image and metadata
     (age, gender, location). It performs the following steps:
     - Checks the presence and format of the image.
     - Validates the image to ensure it is correct.
@@ -82,7 +86,7 @@ def predict_endpoint():
     # Extract the image file
     image_file = request.files["image"]
     # Save the image temporarily for debugging
-    temp_image_path = os.path.join(static_dir, 'temp_uploaded_image.jpg')
+    temp_image_path = os.path.join(static_dir, "temp_uploaded_image.jpg")
     image_file.save(temp_image_path)
 
     # Log image details for debugging
@@ -92,13 +96,17 @@ def predict_endpoint():
     # Check if the content type is valid
     if image_file.content_type not in ["image/jpeg", "image/png", "image/jpg"]:
         logging.error("Unsupported image format: %s", image_file.content_type)
-        return jsonify({"error": "Unsupported image format. Please upload a JPG or PNG file."}), 400
+        return jsonify(
+            {"error": "Unsupported image format. Please upload a JPG or PNG file."}
+        ), 400
 
     try:
         # Try opening the image and verify if it's a valid image
         image = Image.open(temp_image_path)  # Use the saved image path here
         image.verify()  # This will check if the image is valid
-        image = Image.open(temp_image_path)  # Re-read it after verify() for further processing
+        image = Image.open(
+            temp_image_path
+        )  # Re-read it after verify() for further processing
     except (IOError, SyntaxError) as error:
         logging.error("Image is invalid: %s", error)
         return jsonify({"error": "Invalid image file"}), 400
@@ -122,17 +130,20 @@ def predict_endpoint():
 
     # Save the image to display on the result page
     image_file.seek(0)  # Rewind the file pointer before saving
-    image_file.save(os.path.join(static_dir, 'uploaded_image.jpg'))  # Save the image temporarily
+    image_file.save(
+        os.path.join(static_dir, "uploaded_image.jpg")
+    )  # Save the image temporarily
 
-    return jsonify({
-        "prediction": max(prediction, key=prediction.get),  # Classe avec la plus grande proba
-        "probabilities": prediction,
-        "metadata": {
-            "age": age,
-            "sex": sex,
-            "localization": localization
+    return jsonify(
+        {
+            "prediction": max(
+                prediction, key=prediction.get
+            ),  # Classe avec la plus grande proba
+            "probabilities": prediction,
+            "metadata": {"age": age, "sex": sex, "localization": localization},
         }
-    })
+    )
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=5100)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", debug=True, port=5100)

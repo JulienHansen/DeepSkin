@@ -2,7 +2,7 @@
 
 
 
-# Byte-compiled 
+# Byte-compiled
 
 __pycache__/
 *.py[cod]
@@ -51,6 +51,6 @@ static/
 
 # Secrets
 credentials.json
+*credentials.json
 
 final_model.pt
-

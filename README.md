@@ -48,8 +48,8 @@ We are using the **HAM10000** dataset from Kaggle: [HAM10000 Dataset](https://ww
 ### Infrastructure
 
 - **Cloud Deployment**: The model will be hosted on **Google Cloud** to ensure accessibility and scalability.
-- **Backend**: 
-- **Frontend**: 
+- **Backend**:
+- **Frontend**:
 
 <!-- ## :triangular_ruler: Modeling
 
@@ -76,7 +76,7 @@ Inference will be performed in real-time using the deployed model on **Google Cl
 
 ## :bricks: Building Blocks
 
-<!-- 
+<!--
 | Not started | ❌    |
 | In Progress | ⏳  |
 | Done | ✅  |
@@ -104,5 +104,5 @@ Inference will be performed in real-time using the deployed model on **Google Cl
 | 5.2  | W10  | Build and deploy a simple UI/dashboard to showcase results. | ✅ | - | Optional |
 | 6.1  | W10  | Build a CI/CD pipeline (e.g., GitHub Actions) with at least one automated step. | ✅ | - | Required |
 | 6.2  | W10  | CI/CD step: Auto-deploy model serving components. | ✅ | - | Optional |
-| 6.3  | W10  | CI/CD step: Run Pylint for code quality checks. | ⏳  | - | Optional |
+| 6.3  | W10  | CI/CD step: Run Pylint for code quality checks. |  ✅ | - | Optional |
 | 6.4  | W10  | CI/CD step: Run Pytest for unit tests. | ⏳  | - | Optional |
