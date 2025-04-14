@@ -3,7 +3,7 @@ name: Ruff code quality check
 on: [workflow_call]
 
 jobs:
-  ruff:
+  pre-commit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -20,8 +20,8 @@ jobs:
           pip install --no-cache-dir -r deployment/requirements.txt
           pip install --no-cache-dir -r streamlit/requirements.txt
 
-      - name: Install Ruff
-        run: pip install ruff
+      - name: Install pre-commit
+        run: pip install pre-commit
 
-      - name: Run Ruff (without fix)
-        run: ruff check . --exit-zero --output-format=github
+      - name: Run pre-commit hooks (on all files)
+        run: pre-commit run --all-files
